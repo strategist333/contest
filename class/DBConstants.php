@@ -1,5 +1,4 @@
 <?php
-
   $k_post_unread = 0;
   $k_post_read = 1;
   $k_post_reply = 2;

@@ -1,5 +1,5 @@
 <?php
-require_once ('DBConstants.php');
+require_once(__DIR__ . '/DBConstants.php');
 
 class DBManager {
   private static $singleton;
@@ -15,20 +15,31 @@ class DBManager {
     trigger_error('Deserialization is not allowed.', E_USER_ERROR);
   }
   
-  
-  private static function querySelect($sql, $params) {
+  private static function querySelectUnique($sql) {
     $dbh = self::singleton();
     $stmt = $dbh->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute(array_slice(func_get_args(), 1));
+    $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    if (count($res) == 1) {
+      return $res[0];
+    }
+    return false;
+  }
+  
+  private static function querySelect($sql) {
+    $dbh = self::singleton();
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute(array_slice(func_get_args(), 1));
     $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt->closeCursor();
     return $res;
   }
   
-  private static function queryUpdate($sql, $params) {
+  private static function queryUpdate($sql) {
     $dbh = self::singleton();
     $stmt = $dbh->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute(array_slice(func_get_args(), 1));
     $res = $stmt->rowCount();
     $stmt->closeCursor();
     return $res;
@@ -40,7 +51,6 @@ class DBManager {
         self::$singleton = new PDO('mysql:host=localhost;dbname=contest', 'contest', 'proco', array(PDO::ATTR_PERSISTENT => true));
       }
       catch (PDOException $e) {
-        print "DB Error.\n";
         die();
       }
     }
@@ -51,7 +61,7 @@ class DBManager {
     $dbh = self::singleton();
     try {
       $dbh->beginTransaction();
-      $res = self::$func(array_slice(func_get_args(), 1));
+      $res = self::$func();
       $dbh->commit();
     }
     catch (Exception $e) {
@@ -62,9 +72,8 @@ class DBManager {
   }
   
   // Begin definition of procedures
-  private static function getCurrentContestID($params) {
-    $res = self::querySelect('select curr_contest_id from globals', $params);
-    return $res[0]['curr_contest_id'];
+  public static function getCurrentContest() {
+    return self::querySelectUnique('select contest_id, contest_type, contest_name, time_start, time_length, metadata, status from contests, globals where contests.contest_id = globals.curr_contest_id');
   }
   
 }

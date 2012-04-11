@@ -1,5 +1,5 @@
 <?php
-require_once ('../class/common.php');
+require_once(__DIR__ . '/../class/common.php');
 
-echo $g_current_contest_id;
+load('TeamFrontend')->render();
 ?>
