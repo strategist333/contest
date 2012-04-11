@@ -1,0 +1,314 @@
+/*
+Layout from http://ago.tanfa.co.uk/css/layouts/css-3-column-layout-v1.html
+*/
+
+/* 3-Column Layout */
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 750px;
+  min-height: 600px;
+  font-family: Tahoma;
+}
+
+#container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#header {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  height: 50px; 
+  background: #f0f3fa; 
+  width: 100%; 
+  z-index: 10;
+  border-bottom: 1px solid;
+}
+
+#footer {
+  position: absolute; 
+  background: #f0f3fa; 
+  height: 32px; 
+  bottom: 0; left: 0; right: 0;
+  border-top: solid 1px;
+  z-index: 15;
+}
+
+.div-padding {
+  padding: 0.5em;
+}
+.left {
+  width: 225px; 
+  background: #f0f3fa; 
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  margin: 50px 0px 33px 0px;
+  border-right: 2px solid #600;
+  z-index: 5;
+}
+.middle {
+  background: #f0f3fa; 
+  position: absolute;
+  width: auto;
+  min-width: 400px;
+  top: 0; left: 0; bottom: 0; right: 0;
+  margin: 50px 230px 33px 225px;
+}
+.right {
+  width: 230px; 
+  background: #f0f3fa; 
+  position: absolute;
+  top: 0; right: 0; bottom: 0; right: 0;
+  margin: 50px 0px 33px 0px;
+  border-left: 2px solid #600; 
+}
+
+#header #title h1 {
+  margin: 0;
+  height: 42px;
+  text-align: center;
+  padding: 5px;
+  font-variant: small-caps;
+  color: #55a;
+  text-shadow: #333 1px 1px 2px;
+}
+
+#header #timer-div {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-family: monospace;
+  background: #FEE;
+  padding: 0.25em;
+  font-size: 150%;
+  -moz-border-radius: 0 0 0 0.5em;
+  -webkit-border-radius: 0 0 0 0.5em;
+}
+
+#logo-div {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  padding: 4px;
+}
+
+#footer #quote-marquee {
+  height: 18px;
+  background: #f0f3fa;
+  color: #C00;
+  text-align: right;
+  padding: 0.25em;
+  font-family: cursive;
+}
+
+.div-title {
+  color: #000;
+  padding: 0.3em; 
+	margin-bottom: 5px;
+	text-align: center;
+	font-size: 125%;
+  font-weight: bold;
+  font-variant: small-caps;
+  background: #BCE;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+}
+
+#submissions-upload {
+  height: 10em;
+  text-align: center;
+  overflow: visible;
+  border-bottom: solid 1px;
+}
+
+#submissions-upload .form {
+  overflow: hidden;
+}
+
+#submissions-upload-status {
+  border: solid 1px;
+  background: #EEF;
+  text-align: center;
+  margin-top: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+}
+
+#submissions-table-div {
+  background: #f0f3fa; 
+  height: 50%;
+  overflow-y: scroll;
+}
+
+#submissions-table {
+  margin: auto;
+  width: 100%;
+}
+
+#scoreboard-table {
+  margin: auto;
+  width: 100%;
+}
+
+#scoreboard-table-div  {
+  background: #f0f3fa; 
+  height: 50%;
+  overflow-y: scroll;
+  border-top: solid 2px;
+}
+
+#games-table-div {
+  background: #f0f3fa; 
+  height: 40%;
+  overflow-y: scroll;
+}
+
+#games-table {
+  margin: auto;
+  width: 100%;
+}
+
+#games-visualizer-div {
+  background: #FCF8F8; 
+  height: 60%;
+  overflow-y: scroll;
+  border-top: solid 2px;
+}
+
+#games-visualizer-ajax {
+  text-align: center;
+}
+
+#ask {
+  height: 40%;
+  overflow-y: scroll;
+}
+
+#answers {
+  border-top: solid 1px;
+  height: 60%;
+  overflow-y: scroll;
+}
+
+#clarification-ajax {
+  font-size: 80%;
+}
+
+#ask-area {
+	background: #FFFFFF;
+}
+
+#problems {
+}
+
+#problems-info {
+	font-size: 80%;
+  text-align: center;
+	margin: 0 0 0.5em 0;
+}
+
+#problems ul {
+}
+
+.listmenu {
+	margin: 0em;
+}
+
+.listmenu ul {
+  margin: 0 0 5px 0;
+  padding: 0 0 2px 0;
+  list-style-type: none;
+  font-size: 70%;
+}
+
+.listmenu li a {
+  color: #600;
+  display: block;
+  height: 25px;
+  padding: 0.2em;
+  text-decoration: none;
+  font-weight:bold;
+  border-bottom: solid 1px;
+  text-align: center;
+}
+
+.listmenu li a:hover {
+  background: #CAA;
+  color: #FFF;
+}
+
+.results-table td {
+  text-align: center;
+}
+
+.table-head {
+  background: #f8f8dd;
+}
+
+.table-blank {
+  background: #FFFFFF;
+}
+
+.table-row-correct {
+  background: #CCFFCC;
+}
+
+.table-row-incorrect {
+  background: #FFCCCC;
+}
+
+.table-cell-correct {
+  background: #CCFFCC;
+}
+
+.table-cell-incorrect {
+  background: #FFCCCC;
+}
+
+/* File selector styling */
+.SI-FILES-STYLIZED .cabinet
+{
+  height: 20px;
+  position: relative;
+	display: block;
+	overflow: hidden;
+}
+
+.SI-FILES-STYLIZED .cabinet input.file
+{
+	position: absolute;
+  top: 0; right: 129px;
+	height: 20px;
+	width: auto;
+	opacity: 0;
+	-moz-opacity: 0;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+  z-index: 10;
+}
+.SI-FILES-STYLIZED .cabinet div.image
+{
+  position: absolute;
+  top: 0; left: 0;
+  width: 80px;
+  height: 20px;
+  background: url(images/choose_file.png) 0 0 no-repeat;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.SI-FILES-STYLIZED .cabinet div.filename
+{
+  text-align: left;
+  width: 100%;
+	position: absolute;
+  top: 0; left: 85px;
+  cursor: auto;
+  z-index: 15;
+}
