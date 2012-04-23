@@ -32,15 +32,14 @@ function __autoload($base_class_name) {
   loadClassInfo($class_infos, false);
 }
 
-function load($base_class_name) {
-  global $g_curr_contest;
+function load($curr_contest, $base_class_name) {
   $class_infos = array();
-  if ($g_curr_contest) {
-    array_push($class_infos, array('class_name' => ucfirst($g_curr_contest['contest_type']) . $base_class_name, 'contest_type' => $g_curr_contest['contest_type']));
-    array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => $g_curr_contest['contest_type']));
+  if ($curr_contest) {
+    array_push($class_infos, array('class_name' => ucfirst($curr_contest['contest_type']) . $base_class_name, 'contest_type' => $curr_contest['contest_type']));
+    array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => $curr_contest['contest_type']));
   }
   array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => 'default'));
-  return loadClassInfo($class_infos, array_slice(func_get_args(), 1));
+  return loadClassInfo($class_infos, array_slice(func_get_args(), 2));
 }
 
 function footer() {

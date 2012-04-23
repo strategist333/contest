@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS `contests_divisions`;
 DROP TABLE IF EXISTS `problems`;
 DROP TABLE IF EXISTS `divisions`;
 DROP TABLE IF EXISTS `contests`;
+DROP TABLE IF EXISTS `tags`;
 DROP TABLE IF EXISTS `globals`;
 
 CREATE TABLE `globals` (
@@ -16,15 +17,22 @@ CREATE TABLE `globals` (
 
 INSERT INTO `globals` (`curr_contest_id`, `next_judge_id`) VALUES (0, 1);
 
+CREATE TABLE `tags` (
+  `tag` varchar(32) NOT NULL,
+  PRIMARY KEY (`tag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags';
+
 CREATE TABLE `contests` (
   `contest_id` int(11) NOT NULL AUTO_INCREMENT,
   `contest_type` varchar(32) NOT NULL,
   `contest_name` varchar(128) NOT NULL,
   `time_start` int(11) NOT NULL,
   `time_length` int(11) NOT NULL,
+  `tag` varchar(32) NOT NULL,
   `metadata` text NOT NULL,
   `status` tinyint(3) NOT NULL,
-  PRIMARY KEY (`contest_id`)
+  PRIMARY KEY (`contest_id`),
+  FOREIGN KEY (`tag`) REFERENCES `tags` (`tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Contests';
 
 CREATE TABLE `divisions` (
@@ -63,13 +71,15 @@ CREATE TABLE `contests_divisions_problems` (
 
 CREATE TABLE `teams` (
   `team_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tag` varchar(32) NOT NULL,
   `username` varchar(30) NOT NULL,
   `password` char(40) NOT NULL,
   `alias` varchar(100) NOT NULL,
   `division_id` int(11) NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`team_id`),
-  FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`)
+  FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`),
+  FOREIGN KEY (`tag`) REFERENCES `tags` (`tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Teams';
 
 CREATE TABLE `runs` (

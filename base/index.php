@@ -1,5 +1,11 @@
 <?php
 require_once(__DIR__ . '/../class/common.php');
+session_start();
 
-load('TeamFrontend')->render();
+if (!isset($_SESSION['login']) || !$g_curr_contest || $_SESSION['login']['contest_id'] != $g_curr_contest['contest_id']) {
+  unset($_SESSION['login']);
+  header('Location: login.php');
+}
+
+load($g_curr_contest, 'TeamFrontend')->render();
 ?>

@@ -1,0 +1,13 @@
+contests.php: JudgeConfigContest: ?id=<id> ; modify contest details, add new contest, link contest with divisions, clone contest
+divisions.php: JudgeConfigDivison: rename, add divisions (cannot delete)
+teams.php: JudgeConfigTeams: upload / download teams csv for contest
+problems.php: JudgeConfigProblems: 
+judges.php: JudgeViewJudges:
+runs.php: JudgeViewRuns:
+clars.php: JudgeViewClars:
+results.php: JudgeViewResults:
+
+== 
+
+index.php: TeamFrontend:
+submit.php: TeamSubmit:
