@@ -112,6 +112,14 @@ class DBManager {
     return self::queryUpdate('update contests set contest_type = ?, contest_name = ?, time_start = ?, time_length = ?, tag = ?, metadata = ? where contest_id = ? and status = ?', $contest_type, $contest_name, $time_start, $time_length, $tag, $metadata, $contest_id, $k_contest_active);
   }
   
+  public static function cloneContest($contest_id, $contest_name) {
+    $contest = self::getContest($contest_id);
+    if ($contest) {
+      return self::queryInsert('insert into contests set contest_type = ?, contest_name = ?, time_start = ?, time_length = ?, tag = ?, metadata = ?, status = ?', $contest['contest_type'], $contest_name, $contest['time_start'], $contest['time_length'], $contest['tag'], $contest['metadata'], $contest['status']);
+    }
+    return false;
+  }  
+  
   public static function deleteContest($contest_id) {
     global $k_contest_active;
     global $k_contest_inactive;

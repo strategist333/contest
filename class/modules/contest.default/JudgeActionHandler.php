@@ -37,8 +37,9 @@ class JudgeActionHandler {
       }
     }
     else {
-      if (DBManager::modifyContest($in['contest_id'], $contest_type, $contest_name, $time_start, $time_length, $tag, $metadata) == 1) {
-        $out['contest_id'] = $in['contest_id'];
+      $contest_id = $in['contest_id'];
+      if (DBManager::modifyContest($contest_id, $contest_type, $contest_name, $time_start, $time_length, $tag, $metadata) == 1) {
+        $out['contest_id'] = $contest_id;
       }
       else {
         $out['success'] = false;
@@ -47,7 +48,21 @@ class JudgeActionHandler {
   }
   
   public function delete_contest($in, &$out) {
-    $out['success'] = (DBManager::deleteContest($in['contest_id']) == 1);
+    $contest_id = $in['contest_id'];
+    $out['success'] = (DBManager::deleteContest($contest_id) == 1);
+  }
+  
+  public function clone_contest($in, &$out) {
+    $contest_id = $in['contest_id'];
+    $contest_name = $in['contest_name'];
+    $contest_id = DBManager::cloneContest($contest_id, $contest_name);
+    if ($contest_id) {
+      $out['contest_id'] = $contest_id;
+      $out['success'] = true;
+    }
+    else {
+      $out['success'] = false;
+    }
   }
 }
 ?>

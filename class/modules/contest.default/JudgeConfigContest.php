@@ -11,6 +11,7 @@ class JudgeConfigContest {
     $this->contest_id = $contest_id;
   }
   
+  public function renderMetadataLoadDefaultJS() { }
   public function renderMetadataLoadJS() { }
   public function renderMetadataSubmitJS() { }
   public function renderMetadataTR() {
@@ -27,15 +28,21 @@ class JudgeConfigContest {
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript">
 (function ($) {
-  $(document).ready(function() {
-    $.ajaxSetup({
-        url: "handle.php",
-        type: "post",
-        processData: false,
-        dataType: "json"
-      });
+
+  function reloadContest() {
     if ($("#contest_id").val() == 0) {
+      $("#contest_name").val("");
+      $("#start_year").val(2012);
+      $("#start_month").val(0);
+      $("#start_date").val(1);
+      $("#start_hour").val(0);
+      $("#start_minute").val(0);
+      $("#length_hour").val(2);
+      $("#length_minute").val(0);
+      $("#contest_tag").val("default");
+      $("#clone").attr("disabled", "disabled");
       $("#delete").attr("disabled", "disabled");
+<?php $this->renderMetadataLoadDefaultJS(); ?>
     }
     else {
       $.ajax({
@@ -52,15 +59,25 @@ class JudgeConfigContest {
             $("#length_hour").val(Math.floor(ret['time_length'] / 3600));
             $("#length_minute").val(Math.floor(ret['time_length'] % 3600 / 60));
             $("#contest_tag").val(ret['tag']);
+            $("#clone").removeAttr("disabled");
+            $("#delete").removeAttr("disabled");
             var metadata = ret['metadata'];
 <?php $this->renderMetadataLoadJS(); ?>
           }
         }
       });
     }
-    $("#contest_id").change(function() {
-      window.location = "contests.php?contest_type=" + $("#contest_type").val() + "&contest_id=" + $("#contest_id").val();
-    });
+  }
+
+  $(document).ready(function() {
+    $.ajaxSetup({
+        url: "handle.php",
+        type: "post",
+        processData: false,
+        dataType: "json"
+      });
+    reloadContest();
+    $("#contest_id").change(reloadContest);
     $("#contest_type").change(function() {
       window.location = "contests.php?contest_type=" + $("#contest_type").val();
     });
@@ -71,6 +88,19 @@ class JudgeConfigContest {
           success: function(ret) {
             if (ret['success']) {
               window.location = "contests.php?contest_type=" + $("#contest_type").val();
+            }
+          }
+        });
+      }
+    });
+    $("#clone").click(function() {
+      var name = prompt("Give a name to the cloned contest:", $("#contest_name").val() + " copy");
+      if (name) {
+        $.ajax({
+          data: JSON.stringify({'action' : 'clone_contest', 'contest_id' : $("#contest_id").val(), 'contest_name' : name}),
+          success: function(ret) {
+            if (ret['success']) {
+              window.location = "contests.php?contest_type=" + $("#contest_type").val() + "&contest_id=" + ret['contest_id'];
             }
           }
         });
@@ -174,14 +204,15 @@ print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . 
   </tr>
 <?php $this->renderMetadataTR(); ?>
   <tr>
-    <td>Activity</td>
+    <td>Management</td>
     <td>
+      <button id="clone">Clone this contest</button><br />
       <button id="delete">Delete this contest (cannot be undone!)</button>
     </td>
   </tr>
   <tr>
     <td>Contest Tag</td>
-    <td><input type="text" id="contest_tag" size="32" value="default" /><br />Used as a namespace for team usernames</td>
+    <td><input type="text" id="contest_tag" size="32" value="default" /> (Used as a namespace for team usernames)</td>
   </tr>
   <tr>
     <td>Teams Management</td>

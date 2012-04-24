@@ -7,6 +7,14 @@ class SpeedJudgeConfigContest extends JudgeConfigContest {
     parent::__construct($contest_type, $contest_id);
   }
   
+  public function renderMetadataLoadDefaultJS() {
+    parent::renderMetadataLoadJS();
+?>
+            $("#freeze_hour").val(1);
+            $("#freeze_minute").val(30);
+<?php
+  }
+  
   public function renderMetadataLoadJS() {
     parent::renderMetadataLoadJS();
 ?>
