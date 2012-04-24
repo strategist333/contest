@@ -2,14 +2,6 @@
 require_once(__DIR__ . '/../../common.php');
 
 class JudgeConfigDivision {
-
-  private $contest_type;
-  private $contest_id;
-
-  public function __construct($contest_type, $contest_id) {
-    $this->contest_type = $contest_type;
-    $this->contest_id = $contest_id;
-  }
   
   public function render() {
     global $k_months;
@@ -112,13 +104,9 @@ select { width: 200px; }
       Contests (select one): <br />
       <select id="contest_id" size="20">
 <?php
-$first_contest_id = 0;
 foreach (DBManager::getContestTypes() as $contest_type) {
   printf('<option disabled="disabled">[%s]</option>', $contest_type);
   foreach (DBManager::getContestsOfType($contest_type) as $contest) {
-    if ($first_contest_id == 0) {
-      $first_contest_id = $contest['contest_id'];
-    }
     printf('<option value="%d">%s</option>', $contest['contest_id'], $contest['contest_name']);
   }
 }

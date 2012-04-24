@@ -226,18 +226,6 @@ print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . 
     <td>Contest Tag</td>
     <td><input type="text" id="contest_tag" size="32" value="default" /> (Used as a namespace for team usernames)</td>
   </tr>
-  <tr>
-    <td>Teams Management</td>
-    <td>
-      <input type="button" id="download_teams" value="Download csv"></input>
-      <input type="button" id="upload_teams" value="Upload csv"></input>
-      <div id="upload_teams_div">
-        <form action="uploadteams.php" method="post" enctype="multipart/form-data" target="_blank">
-        Select a csv file <input type="file" name="upload_teams_file"></input> to <input type="submit" value="upload"></input>
-        </form>
-      </div>
-    </td>
-  </tr>
 </table>
 <button id="submit">Save</button>
 <br />

@@ -105,7 +105,7 @@ class DBManager {
   
   public static function getContestsOfType($contest_type) {
     global $k_contest_active;
-    return self::querySelect('select contest_id, contest_name from contests where contest_type = ? and status = ? order by contest_id desc', $contest_type, $k_contest_active);
+    return self::querySelect('select contest_id, contest_name, tag from contests where contest_type = ? and status = ? order by contest_id desc', $contest_type, $k_contest_active);
   }
   
   public static function addContest($contest_type, $contest_name, $time_start, $time_length, $tag, $metadata) {
@@ -161,7 +161,7 @@ class DBManager {
     return $res;
   }
   
-  public static function getContestsDivisions($contest_id) {
+  public static function getContestDivisions($contest_id) {
     $divisions = self::querySelect('select division_id from contests_divisions where contest_id = ?', $contest_id);
     return array_map(function ($division) { return $division['division_id']; }, $divisions);
   }
@@ -170,6 +170,72 @@ class DBManager {
     return self::queryUpdate('update divisions set name = ? where division_id = ?', $name, $division_id);
   }
   
+  public static function getTeams($contest_id) {
+    return self::querySelect('select team_id, username, password, alias, name as division_name from contests join contests_divisions using (contest_id) join divisions using (division_id) join teams using (tag, division_id) where contest_id = ?', $contest_id);
+  }
   
+  public static function setTeams($contest_id, $teams) {
+    $dbh = self::singleton();
+    try {
+      $dbh->beginTransaction();
+      $tags = self::querySelectUnique('select tag from contests where contest_id = ?', $contest_id);
+      $tag = $tags['tag'];
+      
+      $divisions = self::querySelect('select division_id, name from divisions join contests_divisions using (division_id) where contest_id = ?', $contest_id);
+      $division_map = array();
+      foreach ($divisions as $division) {
+        $division_map[$division['name']] = $division['division_id'];
+      }
+      
+      $valid_team_ids = array();
+      
+      $update_stmt = $dbh->prepare('update teams set username = ?, password = ?, alias = ?, tag = ?, division_id = ? where team_id = ?');
+      $insert_stmt = $dbh->prepare('insert into teams set username = ?, password = ?, alias = ?, tag = ?, division_id = ?');
+      
+      $update_count = 0;
+      $insert_count = 0;
+      
+      $success = true;
+      foreach ($teams as $team) {
+        $username = $team['username'];
+        $password = $team['password'];
+        $alias = $team['alias'];
+        if (!isset($division_map[$team['division_name']])) {
+          throw new Exception('Invalid division ' . $team['division_name']);
+        }
+        $division_id = $division_map[$team['division_name']];
+        if (isset($team['team_id'])) {
+          $team_id = $team['team_id'];
+          $update_stmt->execute(array($username, $password, $alias, $tag, $division_id, $team_id));
+          $update_count += $update_stmt->rowCount();
+          array_push($valid_team_ids, $team_id);
+        }
+        else {
+          $insert_stmt->execute(array($username, $password, $alias, $tag, $division_id));
+          $insert_count += $insert_stmt->rowCount();
+          $team_id = $dbh->lastInsertID();
+          array_push($valid_team_ids, $team_id);
+        }
+      }
+      $update_stmt->closeCursor();
+      $insert_stmt->closeCursor();
+      
+      $delete_stmt = $dbh->prepare('delete from teams where division_id in (select division_id from contests_divisions where contest_id = ?) and tag = (select tag from contests where contest_id = ?) and team_id not in (' . implode(',', $valid_team_ids) . ')');
+      $delete_stmt->execute(array($contest_id, $contest_id));
+      $delete_count = $delete_stmt->rowCount();
+      
+      $dbh->commit();
+      $res = array('success' => true, 'update' => $update_count, 'insert' => $insert_count, 'delete' => $delete_count);
+    }
+    catch (Exception $e) {
+      $dbh->rollBack();
+      $res = array('success' => false, 'error' => $e->getMessage());
+    }
+    return $res;
+  }
+  
+  public static function getContestTeams($contest_id) {
+    return self::querySelect('select team_id, tag, username, password, alias, name as division_name from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? order by division_name asc, username asc', $contest_id);
+  }
 }
 ?>

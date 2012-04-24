@@ -88,13 +88,18 @@ class JudgeActionHandler {
   
   public function get_contest_divisions($in, &$out) {
     $contest_id = $in['contest_id'];
-    $out['division_ids'] = DBManager::getContestsDivisions($contest_id);
+    $out['division_ids'] = DBManager::getContestDivisions($contest_id);
   }
   
   public function rename_division($in, &$out) {
     $division_id = $in['division_id'];
     $name = $in['name'];
     $out['success'] = (DBManager::modifyDivision($division_id, $name) == 1);
+  }
+  
+  public function get_contest_teams($in, &$out) {
+    $contest_id = $in['contest_id'];
+    $out['teams'] = DBManager::getContestTeams($contest_id);
   }
 }
 ?>
