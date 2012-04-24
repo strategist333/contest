@@ -19,6 +19,7 @@ class JudgeConfigContest {
   
   public function render() {
     global $k_months;
+    global $g_curr_contest;
 // BEGIN RENDER
 ?>
 <html>
@@ -40,6 +41,7 @@ class JudgeConfigContest {
       $("#length_hour").val(2);
       $("#length_minute").val(0);
       $("#contest_tag").val("default");
+      $("#current").hide();
       $("#clone").attr("disabled", "disabled");
       $("#delete").attr("disabled", "disabled");
 <?php $this->renderMetadataLoadDefaultJS(); ?>
@@ -59,6 +61,17 @@ class JudgeConfigContest {
             $("#length_hour").val(Math.floor(ret['time_length'] / 3600));
             $("#length_minute").val(Math.floor(ret['time_length'] % 3600 / 60));
             $("#contest_tag").val(ret['tag']);
+<?php if ($g_curr_contest) { ?>            
+            if (ret['contest_id'] == <?php print $g_curr_contest['contest_id']; ?>) {
+              $("#current").text("Deactivate this contest");
+            }
+            else {
+              $("#current").text("Switch active contest from <?php print $g_curr_contest['contest_name'] ?> to this one");
+            }
+<?php } else { ?>
+            $("#current").text("Set active contest to this one");
+<?php } ?>
+            $("#current").show();
             $("#clone").removeAttr("disabled");
             $("#delete").removeAttr("disabled");
             var metadata = ret['metadata'];
@@ -71,15 +84,25 @@ class JudgeConfigContest {
 
   $(document).ready(function() {
     $.ajaxSetup({
-        url: "handle.php",
-        type: "post",
-        processData: false,
-        dataType: "json"
-      });
+      url: "handle.php",
+      type: "post",
+      processData: false,
+      dataType: "json"
+    });
     reloadContest();
     $("#contest_id").change(reloadContest);
     $("#contest_type").change(function() {
       window.location = "contests.php?contest_type=" + $("#contest_type").val();
+    });
+    $("#current").click(function() {
+      $.ajax({
+        data: JSON.stringify({'action' : 'toggle_current_contest', 'contest_id' : $("#contest_id").val()}),
+        success: function(ret) {
+          if (ret['success']) {
+            window.location = "contests.php?contest_type=" + $("#contest_type").val() + "&contest_id=" + $("#contest_id").val();
+          }
+        }
+      });
     });
     $("#delete").click(function() {
       if (confirm("Are you sure you want to delete this contest?")) {
@@ -140,9 +163,8 @@ class JudgeConfigContest {
 <p><b><big>Modifying Contests of Type 
 <select id="contest_type">
 <?php
-foreach (glob(__DIR__ . '/../contest.*') as $contest_full_type) {
-  $contest_type = substr($contest_full_type, strrpos($contest_full_type, 'contest.') + strlen('contest.'));
-  print '<option value="' . $contest_type . '"' . ($contest_type == $this->contest_type ? ' selected="selected"' : '') . '>' . $contest_type . '</option>';
+foreach (DBManager::getContestTypes() as $contest_type) {
+  printf('<option value="%s"%s>%s</option>', $contest_type, ($contest_type == $this->contest_type ? ' selected="selected"' : ''), $contest_type);
 }
 ?>
 </select>
@@ -154,7 +176,7 @@ foreach (DBManager::getContestsOfType($this->contest_type) as $contest) {
   if ($contest['contest_id'] == $this->contest_id) {
     $contest_selected = true;
   }
-  print '<option value="' . $contest['contest_id'] . '"' . ($contest['contest_id'] == $this->contest_id ? ' selected="selected"' : '') . '>' . htmlentities($contest['contest_name']) . '</option>';
+  printf('<option value="%d"%s>%s</option>', $contest['contest_id'], ($contest['contest_id'] == $this->contest_id ? ' selected="selected"' : ''), htmlentities($contest['contest_name'] . ($g_curr_contest && $g_curr_contest['contest_id'] == $contest['contest_id'] ? ' (current)' : '')));
 }
 print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . '>[New Contest]</option>';
 ?>
@@ -169,30 +191,19 @@ print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . 
   <tr>
     <td>Contest Start</td>
     <td>
-
-<?php
-      print "      <select id=\"start_month\">\n";
-      for ($i = 0; $i < 12; $i++) {
-        print "        <option value=\"$i\">$k_months[$i]</option>\n";
-      }
-      print "      </select>\n";
-      print "      <select id=\"start_date\">\n";
-      for ($i = 1; $i <= 31; $i++) {
-        printf("        <option value=\"%d\">%d</option>\n", $i, $i);
-      }
-      print "      </select>,\n";
-      print "      <input type=\"text\" id=\"start_year\" size=\"4\" value=\"2012\"/><br />\n";
-      print "      <select id=\"start_hour\">\n";
-      for ($i = 0; $i <= 23; $i++) {    
-        printf("        <option value=\"%d\">%02d</option>\n", $i, $i);
-      }
-      print "      </select> :\n";
-      print "      <select id=\"start_minute\">\n";
-      for ($i = 0; $i < 60; $i++) {
-        printf("        <option value=\"%d\">%02d</option>\n", $i, $i);
-      }
-      print "      </select>\n";
-?>
+      <select id="start_month">
+      <?php for ($i = 0; $i < 12; $i++) { printf('<option value=%d>%s</option>', $i, $k_months[$i]); } ?>
+      </select>
+      <select id="start_date">
+      <?php for ($i = 0; $i < 12; $i++) { printf('<option value="%d">%d</option>', $i, $i); } ?>
+      </select>
+      <input type="text" id="start_year" size="4" value="2012"/><br />
+      <select id="start_hour">
+      <?php for ($i = 0; $i <= 23; $i++) { printf('<option value="%d">%02d</option>', $i, $i); } ?>
+      </select> :
+      <select id="start_minute">
+      <?php for ($i = 0; $i < 60; $i++) { printf('<option value="%d">%02d</option>', $i, $i); } ?>
+      </select>
     </td>
   </tr>
   <tr>
@@ -206,6 +217,7 @@ print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . 
   <tr>
     <td>Management</td>
     <td>
+      <button id="current">Set active contest to this one</button><br />
       <button id="clone">Clone this contest</button><br />
       <button id="delete">Delete this contest (cannot be undone!)</button>
     </td>

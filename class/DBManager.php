@@ -71,7 +71,7 @@ class DBManager {
     $dbh = self::singleton();
     try {
       $dbh->beginTransaction();
-      $res = self::$func();
+      $res = $func();
       $dbh->commit();
     }
     catch (Exception $e) {
@@ -82,12 +82,20 @@ class DBManager {
   }
   
   // Begin definition of procedures
+  public static function getContestTypes() {
+    $contest_types = array();
+    foreach (glob(__DIR__ . '/modules/contest.*') as $contest_full_type) {
+      array_push($contest_types, substr($contest_full_type, strrpos($contest_full_type, 'contest.') + strlen('contest.')));
+    }
+    return $contest_types;
+  }
+
   public static function getCurrentContest() {
     return self::querySelectUnique('select contest_id, contest_type, contest_name, time_start, time_length, metadata, status from globals join contests on globals.curr_contest_id = contests.contest_id');
   }
   
   public static function login($username, $password) {
-    return self::querySelectUnique('select team_id, alias, division_id, contest_id from globals join contests on globals.curr_contest_id = contests.contest_id join contests_divisions using (contest_id) join divisions using (division_id) join teams using (division_id) where username = ?, password = ?', $username, $password);
+    return self::querySelectUnique('select team_id, alias, division_id, contest_id from globals join contests on globals.curr_contest_id = contests.contest_id join contests_divisions using (contest_id) join tags using (tag) join divisions using (division_id) join teams using (division_id, tag) where username = ?, password = ?', $username, $password);
   }
   
   public static function getContest($contest_id) {
@@ -97,7 +105,7 @@ class DBManager {
   
   public static function getContestsOfType($contest_type) {
     global $k_contest_active;
-    return self::querySelect('select contest_id, contest_name from contests where contest_type = ? and status = ?', $contest_type, $k_contest_active);
+    return self::querySelect('select contest_id, contest_name from contests where contest_type = ? and status = ? order by contest_id desc', $contest_type, $k_contest_active);
   }
   
   public static function addContest($contest_type, $contest_name, $time_start, $time_length, $tag, $metadata) {
@@ -123,7 +131,45 @@ class DBManager {
   public static function deleteContest($contest_id) {
     global $k_contest_active;
     global $k_contest_inactive;
+    self::queryUpdate('update globals set curr_contest_id = 0 where curr_contest_id = ?', $contest_id);
     return self::queryUpdate('update contests set status = ? where contest_id = ? and status = ?', $k_contest_inactive, $contest_id, $k_contest_active);
   }
+  
+  public static function setCurrentContest($contest_id) {
+    return self::queryUpdate('update globals set curr_contest_id = ?', $contest_id);
+  }
+  
+  public static function getDivisions() {
+    return self::querySelect('select division_id, name from divisions order by name asc');
+  }
+  public static function addDivision($name) {
+    return self::queryInsert('insert into divisions set name = ?', $name);
+  }
+  
+  public static function linkContestsDivisions($contest_id, $division_ids) {
+    $dbh = self::singleton();
+    try {
+      $dbh->beginTransaction();
+      self::queryUpdate('delete from contests_divisions where contest_id = ?', $contest_id);
+      $res = self::queryUpdate('insert into contests_divisions (contest_id, division_id) values ' . implode(',', array_map(function($division_id) use ($contest_id) { return '(' . $contest_id . ',' . $division_id . ')'; }, $division_ids)));
+      $dbh->commit();
+    }
+    catch (Exception $e) {
+      $dbh->rollBack();
+      $res = false;
+    }
+    return $res;
+  }
+  
+  public static function getContestsDivisions($contest_id) {
+    $divisions = self::querySelect('select division_id from contests_divisions where contest_id = ?', $contest_id);
+    return array_map(function ($division) { return $division['division_id']; }, $divisions);
+  }
+  
+  public static function modifyDivision($division_id, $name) {
+    return self::queryUpdate('update divisions set name = ? where division_id = ?', $name, $division_id);
+  }
+  
+  
 }
 ?>

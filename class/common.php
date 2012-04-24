@@ -2,8 +2,7 @@
 require_once('DBManager.php');
 
 // Get current contest
-//$g_curr_contest = DBManager::getCurrentContest();
-$g_curr_contest = array('contest_type' => 'speed');
+$g_curr_contest = DBManager::getCurrentContest();
 
 function loadClassInfo($class_infos, $params) {
   foreach ($class_infos as $class_info) {
