@@ -2,10 +2,6 @@
 require_once(__DIR__ . '/../../common.php');
 
 class SpeedJudgeConfigContest extends JudgeConfigContest {
-
-  public function __construct($contest_type, $contest_id) {
-    parent::__construct($contest_type, $contest_id);
-  }
   
   public function renderMetadataLoadDefaultJS() {
     parent::renderMetadataLoadJS();

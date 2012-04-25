@@ -72,8 +72,8 @@ class JudgeActionHandler {
   }
   
   public function add_division($in, &$out) {
-    $name = $in['name'];
-    $division_id = DBManager::addDivision($name);
+    $division_name = $in['division_name'];
+    $division_id = DBManager::addDivision($division_name);
     if ($division_id) {
       $out['division_id'] = $division_id;
     }
@@ -88,18 +88,46 @@ class JudgeActionHandler {
   
   public function get_contest_divisions($in, &$out) {
     $contest_id = $in['contest_id'];
-    $out['division_ids'] = DBManager::getContestDivisions($contest_id);
+    $divisions = DBManager::getContestDivisions($contest_id);
+    $out['division_ids'] = array_map(function ($division) { return $division['division_id']; }, $divisions);
   }
   
   public function rename_division($in, &$out) {
     $division_id = $in['division_id'];
-    $name = $in['name'];
-    $out['success'] = (DBManager::modifyDivision($division_id, $name) == 1);
+    $division_name = $in['division_name'];
+    $out['success'] = (DBManager::modifyDivision($division_id, $division_name) == 1);
   }
   
   public function get_contest_teams($in, &$out) {
     $contest_id = $in['contest_id'];
     $out['teams'] = DBManager::getContestTeams($contest_id);
+  }
+  
+  public function get_contest_problems($in, &$out) {
+    $contest_id = $in['contest_id'];
+    $divisions = DBManager::getContestDivisions($contest_id);
+    $problems = DBManager::getContestProblems($contest_id);
+    $out['divisions'] = $divisions;
+    $out['problems'] = $problems;
+  }
+  
+  public function modify_problem($in, &$out) {
+    global $k_problems_fields;
+    global $k_contest_divisions_problems_fields;
+    $key = $in['key'];
+    $value = $in['value'];
+    $problem_id = $in['problem_id'];
+    $division_id = $in['division_id'];
+    $contest_id = $in['contest_id'];
+    if (in_array($key, $k_problems_fields)) {
+      $out['success'] = (DBManager::modifyProblem($problem_id, $key, $value) == 1);
+    }
+    else if (in_array($key, $k_contest_divisions_problems_fields)) {
+      $out['success'] = (DBManager::modifyContestDivisionProblem($problem_id, $division_id, $contest_id, $key, $value) == 1);
+    }
+    else {
+      $out['success'] = false;
+    }
   }
 }
 ?>

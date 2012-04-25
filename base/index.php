@@ -7,5 +7,5 @@ if (!isset($_SESSION['login']) || !$g_curr_contest || $_SESSION['login']['contes
   header('Location: login.php');
 }
 
-load($g_curr_contest, 'TeamFrontend')->render();
+load(currentContestType(), 'TeamFrontend')->render();
 ?>

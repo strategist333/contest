@@ -94,7 +94,7 @@ foreach (DBManager::getContestTypes() as $contest_type) {
       <select id="division_id" size="20" multiple="multiple" disabled="disabled">
 <?php
 foreach (DBManager::getDivisions() as $division) {
-  printf('<option value="%d">%s</option>', $division['division_id'], $division['name']);
+  printf('<option value="%d">%s</option>', $division['division_id'], $division['division_name']);
 }
 ?>
       </select>

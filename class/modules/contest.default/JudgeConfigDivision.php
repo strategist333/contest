@@ -34,11 +34,12 @@ class JudgeConfigDivision {
         }
       });
     });
+    $("#contest_id").val($("#contest_id option:enabled").val()).change();
     $("#new_division").click(function() {
       var name = prompt("New division name:");
       if (name) {
         $.ajax({
-          data: JSON.stringify({'action' : 'add_division', 'name' : name}),
+          data: JSON.stringify({'action' : 'add_division', 'division_name' : name}),
           success: function(ret) {
             if (ret['success']) {
               $("#division_id").append($("<option>").val(ret['division_id']).text(name));
@@ -54,7 +55,7 @@ class JudgeConfigDivision {
         var name = prompt("New division name:");
         if (name) {
           $.ajax({
-            data: JSON.stringify({'action' : 'rename_division', 'division_id' : divisionID, 'name' : name}),
+            data: JSON.stringify({'action' : 'rename_division', 'division_id' : divisionID, 'division_name' : name}),
             success: function(ret) {
               if (ret['success']) {
                 options.eq(0).text(name);
@@ -118,7 +119,7 @@ foreach (DBManager::getContestTypes() as $contest_type) {
       <select id="division_id" size="20" multiple="multiple">
 <?php
 foreach (DBManager::getDivisions() as $division) {
-  printf('<option value="%d">%s</option>', $division['division_id'], $division['name']);
+  printf('<option value="%d">%s</option>', $division['division_id'], $division['division_name']);
 }
 ?>
       </select>

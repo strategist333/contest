@@ -42,4 +42,7 @@
     "October", "November", "December"
   );
   
+  $k_teams_fields = array('team_id', 'username', 'password', 'alias', 'division_name');
+  $k_problems_fields = array('problem_type', 'title', 'status');
+  $k_contest_divisions_problems_fields = array('url', 'alias', 'display_alias', 'point_value', 'metadata');
 ?>

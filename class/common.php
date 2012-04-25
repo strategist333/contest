@@ -4,17 +4,29 @@ require_once('DBManager.php');
 // Get current contest
 $g_curr_contest = DBManager::getCurrentContest();
 
-function loadClassInfo($class_infos, $params) {
-  foreach ($class_infos as $class_info) {
-    $filepath = __DIR__ . '/modules/contest.' . $class_info['contest_type'] . '/' . $class_info['class_name']. '.php';
-    if (file_exists($filepath)) {
-      include_once($filepath);
-      if (is_array($params)) {
-        $reflection_obj = new ReflectionClass($class_info['class_name']);
-        return $reflection_obj->newInstanceArgs($params); 
-      }
-      else {
-        break;
+function currentContestType() {
+  global $g_curr_contest;
+  return $g_curr_contest ? $g_curr_contest['contest_type'] : 'default';
+}
+
+function loadClassInfo($curr_contest_type, $class_names, $params) {
+
+  $folders = array('contest.' . $curr_contest_type);
+  if ($curr_contest_type != 'default') {
+    array_push($folders, 'contest.default');
+  }
+  foreach ($folders as $folder) {
+    $it = new RecursiveDirectoryIterator(__DIR__ . '/modules/' . $folder);
+    foreach (new RecursiveIteratorIterator($it) as $file) {
+      if (in_array(basename($file, '.php'), $class_names)) {
+        include_once($file);
+        if (is_array($params)) {
+          $reflection_obj = new ReflectionClass(basename($file, '.php'));
+          return $reflection_obj->newInstanceArgs($params); 
+        }
+        else {
+          break;
+        }
       }
     }
   }
@@ -22,23 +34,19 @@ function loadClassInfo($class_infos, $params) {
 }
 
 function __autoload($base_class_name) {
-  global $g_curr_contest;
-  $class_infos = array();
-  if ($g_curr_contest) {
-    array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => $g_curr_contest['contest_type']));
-  }
-  array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => 'default'));
-  loadClassInfo($class_infos, false);
+  loadClassInfo(currentContestType(), array($base_class_name), false);
 }
 
-function load($curr_contest, $base_class_name) {
-  $class_infos = array();
-  if ($curr_contest) {
-    array_push($class_infos, array('class_name' => ucfirst($curr_contest['contest_type']) . $base_class_name, 'contest_type' => $curr_contest['contest_type']));
-    array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => $curr_contest['contest_type']));
+function load($curr_contest_type, $base_class_name) {
+  return call_user_func_array('loadWithPrefix', array_merge(array($curr_contest_type, $curr_contest_type, $base_class_name), array_slice(func_get_args(), 2)));
+}
+
+function loadWithPrefix($curr_contest_type, $prefix, $base_class_name) {
+  $class_names = array($base_class_name);
+  if ($curr_contest_type != 'default') {
+    array_push($class_names, ucfirst($prefix) . $base_class_name);
   }
-  array_push($class_infos, array('class_name' => $base_class_name, 'contest_type' => 'default'));
-  return loadClassInfo($class_infos, array_slice(func_get_args(), 2));
+  return loadClassInfo($curr_contest_type, $class_names, array_slice(func_get_args(), 3));
 }
 
 function footer() {

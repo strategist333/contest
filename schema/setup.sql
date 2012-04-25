@@ -37,7 +37,7 @@ CREATE TABLE `contests` (
 
 CREATE TABLE `divisions` (
   `division_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
+  `division_name` varchar(50) NOT NULL,
   PRIMARY KEY (`division_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Divisions';
 
@@ -64,6 +64,7 @@ CREATE TABLE `contests_divisions_problems` (
   `alias` varchar(16) NOT NULL,
   `display_alias` varchar(128) NOT NULL,
   `point_value` int(11) NOT NULL,
+  `metadata` text NOT NULL,
   FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
   FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`),
   FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`)

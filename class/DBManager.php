@@ -140,10 +140,10 @@ class DBManager {
   }
   
   public static function getDivisions() {
-    return self::querySelect('select division_id, name from divisions order by name asc');
+    return self::querySelect('select division_id, division_name from divisions order by division_name asc');
   }
-  public static function addDivision($name) {
-    return self::queryInsert('insert into divisions set name = ?', $name);
+  public static function addDivision($division_name) {
+    return self::queryInsert('insert into divisions set division_name = ?', $division_name);
   }
   
   public static function linkContestsDivisions($contest_id, $division_ids) {
@@ -162,16 +162,15 @@ class DBManager {
   }
   
   public static function getContestDivisions($contest_id) {
-    $divisions = self::querySelect('select division_id from contests_divisions where contest_id = ?', $contest_id);
-    return array_map(function ($division) { return $division['division_id']; }, $divisions);
+    return self::querySelect('select division_id, division_name from contests_divisions join divisions using (division_id) where contest_id = ? order by division_name asc', $contest_id);
   }
   
-  public static function modifyDivision($division_id, $name) {
-    return self::queryUpdate('update divisions set name = ? where division_id = ?', $name, $division_id);
+  public static function modifyDivision($division_id, $division_name) {
+    return self::queryUpdate('update divisions set division_name = ? where division_id = ?', $division_name, $division_id);
   }
   
   public static function getTeams($contest_id) {
-    return self::querySelect('select team_id, username, password, alias, name as division_name from contests join contests_divisions using (contest_id) join divisions using (division_id) join teams using (tag, division_id) where contest_id = ?', $contest_id);
+    return self::querySelect('select team_id, username, password, alias, division_name from contests join contests_divisions using (contest_id) join divisions using (division_id) join teams using (tag, division_id) where contest_id = ?', $contest_id);
   }
   
   public static function setTeams($contest_id, $teams) {
@@ -181,10 +180,10 @@ class DBManager {
       $tags = self::querySelectUnique('select tag from contests where contest_id = ?', $contest_id);
       $tag = $tags['tag'];
       
-      $divisions = self::querySelect('select division_id, name from divisions join contests_divisions using (division_id) where contest_id = ?', $contest_id);
+      $divisions = self::querySelect('select division_id, division_name from divisions join contests_divisions using (division_id) where contest_id = ?', $contest_id);
       $division_map = array();
       foreach ($divisions as $division) {
-        $division_map[$division['name']] = $division['division_id'];
+        $division_map[$division['division_name']] = $division['division_id'];
       }
       
       $valid_team_ids = array();
@@ -235,7 +234,19 @@ class DBManager {
   }
   
   public static function getContestTeams($contest_id) {
-    return self::querySelect('select team_id, tag, username, password, alias, name as division_name from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? order by division_name asc, username asc', $contest_id);
+    return self::querySelect('select team_id, tag, username, password, alias, division_name from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? order by division_name asc, username asc', $contest_id);
+  }
+  
+  public static function getContestProblems($contest_id) {
+    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, display_alias, point_value, metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by problem_id asc, division_id asc', $contest_id);
+  }
+  
+  public static function modifyProblem($problem_id, $key, $value) {
+    return self::queryUpdate('update problems set ' . $key . ' = ? where problem_id = ?', $value, $problem_id);
+  }
+  
+  public static function modifyContestDivisionProblem($problem_id, $division_id, $contest_id, $key, $value) {
+    return self::queryUpdate('update contests_divisions_problems set ' . $key . ' = ? where problem_id = ? and division_id = ? and contest_id = ?', $value, $problem_id, $division_id, $contest_id);
   }
 }
 ?>

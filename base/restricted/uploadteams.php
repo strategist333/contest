@@ -19,12 +19,11 @@ if (isset($_FILES['upload_teams_file']) && !$_FILES['upload_teams_file']['error'
 
   $teams = array();
   foreach ($csv->data as $key => $csv_row) {
-    $fields = array('team_id', 'username', 'password', 'alias', 'division_name');
     $row = array();
     foreach ($csv_row as $field_utr => $value_utr) {
       $field = trim($field_utr);
       $value = trim($value_utr);
-      if (in_array($field, $fields) && $value) {
+      if (in_array($field, $k_teams_fields) && $value) {
         $row[$field] = $value;
       }
     }
