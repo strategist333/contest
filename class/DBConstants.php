@@ -31,9 +31,8 @@
   $k_team_inactive = 0;
   $k_team_active = 1;
   
-  $k_problem_active = 1;
   $k_problem_inactive = 0;
-  $k_problem_deleted = 2;
+  $k_problem_active = 1;
   
   $k_months = array(
     "January", "February", "March",
@@ -43,6 +42,6 @@
   );
   
   $k_teams_fields = array('team_id', 'username', 'password', 'alias', 'division_name');
-  $k_problems_fields = array('problem_type', 'title', 'status');
-  $k_contest_divisions_problems_fields = array('url', 'alias', 'display_alias', 'point_value', 'metadata');
+  $k_problems_fields = array('problem_type', 'title', 'status', 'metadata');
+  $k_contest_divisions_problems_fields = array('url', 'alias', 'display_alias', 'point_value', 'division_metadata');
 ?>

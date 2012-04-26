@@ -5,6 +5,7 @@ class JudgeConfigDivision {
   
   public function render() {
     global $k_months;
+    global $g_curr_contest;
 // BEGIN RENDER
 ?>
 <html>
@@ -34,7 +35,11 @@ class JudgeConfigDivision {
         }
       });
     });
+<?php if ($g_curr_contest) { ?>
+    $("#contest_id").val(<?= $g_curr_contest['contest_id'] ?>).change();
+<?php } else { ?>
     $("#contest_id").val($("#contest_id option:enabled").val()).change();
+<?php } ?>
     $("#new_division").click(function() {
       var name = prompt("New division name:");
       if (name) {

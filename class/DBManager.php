@@ -89,6 +89,20 @@ class DBManager {
     }
     return $contest_types;
   }
+  
+  public static function getProblemTypes($curr_contest_type) {
+    $contest_types = array($curr_contest_type);
+    if ($curr_contest_type != 'default') {
+      array_push($contest_types, 'default');
+    }
+    $problem_types = array();
+    foreach ($contest_types as $contest_type) {
+      foreach (glob(__DIR__ . '/modules/contest.' . $contest_type . '/problem.*') as $problem_full_type) {
+        array_push($problem_types, substr($problem_full_type, strrpos($problem_full_type, 'problem.') + strlen('problem.')));
+      }
+    }
+    return $problem_types;
+  }
 
   public static function getCurrentContest() {
     return self::querySelectUnique('select contest_id, contest_type, contest_name, time_start, time_length, metadata, status from globals join contests on globals.curr_contest_id = contests.contest_id');
@@ -238,7 +252,7 @@ class DBManager {
   }
   
   public static function getContestProblems($contest_id) {
-    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, display_alias, point_value, metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by problem_id asc, division_id asc', $contest_id);
+    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, display_alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, division_id asc', $contest_id);
   }
   
   public static function modifyProblem($problem_id, $key, $value) {
@@ -248,5 +262,36 @@ class DBManager {
   public static function modifyContestDivisionProblem($problem_id, $division_id, $contest_id, $key, $value) {
     return self::queryUpdate('update contests_divisions_problems set ' . $key . ' = ? where problem_id = ? and division_id = ? and contest_id = ?', $value, $problem_id, $division_id, $contest_id);
   }
+  
+  public static function getContestDivisionProblem($problem_id, $division_id, $contest_id) {
+    return self::querySelectUnique('select problem_id, problem_type, title, status, division_id, url, alias, display_alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and problem_id = ?', $contest_id, $division_id, $problem_id);
+  }
+  
+  public static function addContestDivisionProblem($problem_id, $division_id, $contest_id) {
+    return self::queryUpdate('insert ignore into contests_divisions_problems set problem_id = ?, division_id = ?, contest_id = ?, division_metadata = ?', $problem_id, $division_id, $contest_id, '{}');
+  }
+  
+  public static function removeContestDivisionProblem($problem_id, $division_id, $contest_id) {
+    return self::queryUpdate('delete from contests_divisions_problems where problem_id = ? and division_id = ? and contest_id = ?', $problem_id, $division_id, $contest_id);
+  }
+  
+  public static function addProblem() {
+    global $k_problem_active;
+    $dbh = self::singleton();
+    try {
+      $dbh->beginTransaction();
+      $res = self::queryInsert('insert into problems set status = ?, metadata = ?, order_seq = (select next_order_seq from globals)', $k_problem_active, '{}');
+      self::queryUpdate('update globals set next_order_seq = next_order_seq + 1');
+      $dbh->commit();
+    }
+    catch (Exception $e) {
+      $dbh->rollBack();
+      $res = false;
+    }
+    return $res;
+    
+  }
+  
+  
 }
 ?>

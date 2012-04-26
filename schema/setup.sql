@@ -12,10 +12,11 @@ DROP TABLE IF EXISTS `globals`;
 
 CREATE TABLE `globals` (
   `curr_contest_id` int(11) NOT NULL,
-  `next_judge_id` int(11) NOT NULL
+  `next_judge_id` int(11) NOT NULL,
+  `next_order_seq` int(11) NOT NULL
 );
 
-INSERT INTO `globals` (`curr_contest_id`, `next_judge_id`) VALUES (0, 1);
+INSERT INTO `globals` (`curr_contest_id`, `next_judge_id`, `next_order_seq`) VALUES (0, 1, 1);
 
 CREATE TABLE `tags` (
   `tag` varchar(32) NOT NULL,
@@ -43,8 +44,10 @@ CREATE TABLE `divisions` (
 
 CREATE TABLE `problems` (
   `problem_id` int(11) NOT NULL AUTO_INCREMENT,
-  `problem_type` varchar(32) NOT NULL,
-  `title` varchar(128) NOT NULL,
+  `problem_type` varchar(32) NOT NULL DEFAULT 'default',
+  `title` varchar(128) NOT NULL DEFAULT '',
+  `order_seq` int(11) NOT NULL,
+  `metadata` text NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Problems';
@@ -60,14 +63,14 @@ CREATE TABLE `contests_divisions_problems` (
   `contest_id` int(11) NOT NULL,
   `division_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
-  `url` varchar(250) NOT NULL,
-  `alias` varchar(16) NOT NULL,
-  `display_alias` varchar(128) NOT NULL,
-  `point_value` int(11) NOT NULL,
-  `metadata` text NOT NULL,
+  `url` varchar(250) NOT NULL DEFAULT '',
+  `alias` varchar(32) NOT NULL DEFAULT '',
+  `display_alias` varchar(128) NOT NULL DEFAULT '',
+  `division_metadata` text NOT NULL,
   FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
   FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`),
-  FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`)
+  FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`),
+  UNIQUE INDEX (`contest_id`, `division_id`, `problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Contests_Divisions_Problems';
 
 CREATE TABLE `teams` (

@@ -105,10 +105,13 @@ class JudgeActionHandler {
   
   public function get_contest_problems($in, &$out) {
     $contest_id = $in['contest_id'];
+    $contest = DBManager::getContest($contest_id);
+    $problem_types = DBManager::getProblemTypes($contest['contest_type']);
     $divisions = DBManager::getContestDivisions($contest_id);
     $problems = DBManager::getContestProblems($contest_id);
     $out['divisions'] = $divisions;
     $out['problems'] = $problems;
+    $out['problem_types'] = $problem_types;
   }
   
   public function modify_problem($in, &$out) {
@@ -124,6 +127,34 @@ class JudgeActionHandler {
     }
     else if (in_array($key, $k_contest_divisions_problems_fields)) {
       $out['success'] = (DBManager::modifyContestDivisionProblem($problem_id, $division_id, $contest_id, $key, $value) == 1);
+    }
+    else {
+      $out['success'] = false;
+    }
+  }
+  
+  public function enable_problem($in, &$out) {
+    $problem_id = $in['problem_id'];
+    $division_id = $in['division_id'];
+    $contest_id = $in['contest_id'];
+    DBManager::addContestDivisionProblem($problem_id, $division_id, $contest_id);
+    $out['problem'] = DBManager::getContestDivisionProblem($problem_id, $division_id, $contest_id);
+  }
+  
+  public function disable_problem($in, &$out) {
+    $problem_id = $in['problem_id'];
+    $division_id = $in['division_id'];
+    $contest_id = $in['contest_id'];
+    $out['success'] = (DBManager::removeContestDivisionProblem($problem_id, $division_id, $contest_id) == 1);
+  }
+  
+  public function add_problem($in, &$out) {
+    $division_id = $in['division_id'];
+    $contest_id = $in['contest_id'];
+    $problem_id = DBManager::addProblem();
+    if ($problem_id) {
+      DBManager::addContestDivisionProblem($problem_id, $division_id, $contest_id);
+      $out['problem'] = DBManager::getContestDivisionProblem($problem_id, $division_id, $contest_id);
     }
     else {
       $out['success'] = false;

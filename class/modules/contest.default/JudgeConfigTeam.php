@@ -5,6 +5,7 @@ class JudgeConfigTeam {
   
   public function render() {
     global $k_months;
+    global $g_curr_contest;
 // BEGIN RENDER
 ?>
 <html>
@@ -53,7 +54,11 @@ class JudgeConfigTeam {
         }
       });
     });
+<?php if ($g_curr_contest) { ?>
+    $("#contest_id").val(<?= $g_curr_contest['contest_id'] ?>).change();
+<?php } else { ?>
     $("#contest_id").val($("#contest_id option:enabled").val()).change();
+<?php } ?>
     $("#download").click(function() {
       window.location.assign("downloadteams.php?contest_id=" + $("#contest_id").val());
     });

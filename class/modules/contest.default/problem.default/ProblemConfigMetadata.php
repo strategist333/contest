@@ -7,12 +7,14 @@ class ProblemConfigMetadata {
   protected $division_id;
   protected $contest_id;
   protected $metadata;
+  protected $division_metadata;
   
-  public function __construct($problem_id, $division_id, $contest_id, $metadata) {
+  public function __construct($problem_id, $division_id, $contest_id, $metadata, $division_metadata) {
     $this->problem_id = $problem_id;
     $this->division_id = $division_id;
     $this->contest_id = $contest_id;
     $this->metadata = $metadata;
+    $this->division_metadata = $division_metadata;
   }
   
   protected function transformID($id) {
