@@ -8,13 +8,20 @@ class SpeedProblemConfigMetadata extends ProblemConfigMetadata {
     if (!isset($this->division_metadata['points'])) {
       $this->division_metadata['points'] = 0;
     }
+    if (!isset($this->metadata['judge_io'])) {
+      $this->metadata['judge_io'] = array();
+    }
   }
   
   public function render() {
     parent::render();
     $pointsID = $this->transformID('points');
     $points = $this->division_metadata['points'];
-    
+    $downloadID = $this->transformID('download');
+    $uploadID = $this->transformID('upload');
+    $uploadFileID = $this->transformID('upload_file');
+    $uploadFormID = $this->transformID('upload_form');
+    $uploadFrameID = $this->transformID('upload_frame');
 ?>
 <script type="text/javascript">
 (function (problemID, divisionID, contestID, metadata, divisionMetadata) {
@@ -33,9 +40,33 @@ class SpeedProblemConfigMetadata extends ProblemConfigMetadata {
       }
     });
   });
+  $("#<?= $downloadID ?>").click(function() {
+    window.location.assign("handlefile.php?action=download_speed_zip&problem_id=" + problemID + "&division_id=" + divisionID + "&contest_id=" + contestID);
+  });
 })(<?php print $this->problem_id ?>, <?= $this->division_id ?>, <?= $this->contest_id ?>, <?= json_encode($this->metadata) ?>, <?= json_encode($this->division_metadata) ?>);
 </script>
-Point value: <input id="<?= $pointsID ?>" type="text" value="<?= $points ?>"></input><br />
+<table>
+  <tr>
+    <td>Point value:</td>
+    <td><input id="<?= $pointsID ?>" type="text" value="<?= $points ?>"></input></td>
+  </tr>
+  <tr>
+    <td>Judge in/out:</td>
+    <td>
+      <button id="<?= $downloadID ?>">Download</button>
+      <form id="<?= $uploadFormID ?>" action="handlefile.php" method="post" enctype="multipart/form-data" target="<?= $uploadFrameID ?>">
+        <input id="<?= $uploadFileID ?>" type="file" name="upload_file"></input> 
+        <input id="<?= $uploadID ?>" type="submit" value="zip upload"></input>
+        <input type="hidden" name="problem_id" value="<?= $this->problem_id ?>"></input>
+        <input type="hidden" name="division_id" value="<?= $this->division_id ?>"></input>
+        <input type="hidden" name="contest_id" value="<?= $this->contest_id ?>"></input>
+        <input type="hidden" name="action" value="upload_speed_zip"></input>
+        <br />
+        <iframe name="<?= $uploadFrameID ?>" style="width: 200px; height: 30px; border: 0px;"></iframe>
+      </form>
+    </td>
+  </tr>
+</table>
 <?php
 // END RENDER
   }

@@ -64,13 +64,12 @@ CREATE TABLE `contests_divisions_problems` (
   `division_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
   `url` varchar(250) NOT NULL DEFAULT '',
-  `alias` varchar(32) NOT NULL DEFAULT '',
-  `display_alias` varchar(128) NOT NULL DEFAULT '',
+  `alias` varchar(128) NOT NULL DEFAULT '',
   `division_metadata` text NOT NULL,
+  PRIMARY KEY (`contest_id`, `division_id`, `problem_id`),
   FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
   FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`),
-  FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`),
-  UNIQUE INDEX (`contest_id`, `division_id`, `problem_id`)
+  FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Contests_Divisions_Problems';
 
 CREATE TABLE `teams` (

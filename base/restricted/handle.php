@@ -16,7 +16,6 @@ if (isset($json['action'])) {
   } catch (Exception $e) {
     $ret['success'] = false;
     $ret['error'] = $e->getMessage();
-    
   }
 }
 

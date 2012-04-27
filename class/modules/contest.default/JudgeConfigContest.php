@@ -195,7 +195,7 @@ print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . 
       <?php for ($i = 0; $i < 12; $i++) { printf('<option value=%d>%s</option>', $i, $k_months[$i]); } ?>
       </select>
       <select id="start_date">
-      <?php for ($i = 0; $i < 12; $i++) { printf('<option value="%d">%d</option>', $i, $i); } ?>
+      <?php for ($i = 1; $i <= 31; $i++) { printf('<option value="%d">%d</option>', $i, $i); } ?>
       </select>
       <input type="text" id="start_year" size="4" value="2012"/><br />
       <select id="start_hour">

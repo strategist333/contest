@@ -44,11 +44,11 @@ class TeamLogin {
   if (!isset($_SESSION['login'])) {
 ?>
 <script type="text/javascript">
-  <!--
+(function ($) {
   $(document).ready( function() {
     $("#username-input").focus();
   });
-  //-->
+)(window.jQuery);
 </script>
 <?php
   }
@@ -68,7 +68,6 @@ class TeamLogin {
 
 <hr>
 <div align="center">
-
 <?php
   print implode("\n", $bodyHTML);
   if (!isset($_SESSION['login'])) {

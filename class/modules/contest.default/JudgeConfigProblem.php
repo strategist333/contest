@@ -107,11 +107,10 @@ class JudgeConfigProblem {
            .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'title', true)))
            .append($("<td>").append(makeProblemTypeDropdown(problemID, divisionID, contestID, problem, 'problem_type', true)))
            .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'url', false)))
-           .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'display_alias', false)))
            .append($("<td>").load("problemmetadata.php", {'data' : JSON.stringify({'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'metadata' : problem['metadata'], 'division_metadata' : problem['division_metadata'], 'problem_type' : problem['problem_type']})}));
       }
       else {
-        row.append($("<td>").attr("colspan", 6).text("Not used"));
+        row.append($("<td>").attr("colspan", 5).text("Not used"));
       }
     }
     function appendRows(problemID) {
@@ -230,11 +229,10 @@ foreach (DBManager::getContestTypes() as $contest_type) {
             <td>Problem ID</td>
             <td>Division</td>
             <td>Used</td>
-            <td>Filename</td>
+            <td>Alias</td>
             <td>Title</td>
             <td>Type</td>
             <td>URL</td>
-            <td>Alias</td>
             <td>Metadata</td>
           </tr>
         </thead>

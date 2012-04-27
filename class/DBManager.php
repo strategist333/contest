@@ -109,7 +109,7 @@ class DBManager {
   }
   
   public static function login($username, $password) {
-    return self::querySelectUnique('select team_id, alias, division_id, contest_id from globals join contests on globals.curr_contest_id = contests.contest_id join contests_divisions using (contest_id) join tags using (tag) join divisions using (division_id) join teams using (division_id, tag) where username = ?, password = ?', $username, $password);
+    return self::querySelectUnique('select team_id, alias, division_id, contest_id from globals join contests on globals.curr_contest_id = contests.contest_id join contests_divisions using (contest_id) join tags using (tag) join divisions using (division_id) join teams using (division_id, tag) where username = ? and password = ?', $username, $password);
   }
   
   public static function getContest($contest_id) {
@@ -220,11 +220,17 @@ class DBManager {
         if (isset($team['team_id'])) {
           $team_id = $team['team_id'];
           $update_stmt->execute(array($username, $password, $alias, $tag, $division_id, $team_id));
+          if ($update_stmt->rowCount() != 1) {
+            throw new Exception('Failed to update ' . $team_id);
+          }
           $update_count += $update_stmt->rowCount();
           array_push($valid_team_ids, $team_id);
         }
         else {
           $insert_stmt->execute(array($username, $password, $alias, $tag, $division_id));
+          if ($insert_stmt->rowCount() != 1) {
+            throw new Exception('Failed to insert ' . $team_id);
+          }
           $insert_count += $insert_stmt->rowCount();
           $team_id = $dbh->lastInsertID();
           array_push($valid_team_ids, $team_id);
@@ -236,6 +242,10 @@ class DBManager {
       $delete_stmt = $dbh->prepare('delete from teams where division_id in (select division_id from contests_divisions where contest_id = ?) and tag = (select tag from contests where contest_id = ?) and team_id not in (' . implode(',', $valid_team_ids) . ')');
       $delete_stmt->execute(array($contest_id, $contest_id));
       $delete_count = $delete_stmt->rowCount();
+      
+      if ($delete_count != count($teams) - count($valid_team_ids)) {
+        throw new Exception('Failed to delete');
+      }
       
       $dbh->commit();
       $res = array('success' => true, 'update' => $update_count, 'insert' => $insert_count, 'delete' => $delete_count);
@@ -252,7 +262,7 @@ class DBManager {
   }
   
   public static function getContestProblems($contest_id) {
-    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, display_alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, division_id asc', $contest_id);
+    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, division_id asc', $contest_id);
   }
   
   public static function modifyProblem($problem_id, $key, $value) {
@@ -264,7 +274,7 @@ class DBManager {
   }
   
   public static function getContestDivisionProblem($problem_id, $division_id, $contest_id) {
-    return self::querySelectUnique('select problem_id, problem_type, title, status, division_id, url, alias, display_alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and problem_id = ?', $contest_id, $division_id, $problem_id);
+    return self::querySelectUnique('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and problem_id = ?', $contest_id, $division_id, $problem_id);
   }
   
   public static function addContestDivisionProblem($problem_id, $division_id, $contest_id) {
@@ -289,9 +299,25 @@ class DBManager {
       $res = false;
     }
     return $res;
-    
   }
   
+  public static function addRun($team_id, $division_id, $contest_id, $filebase, $payload, $time_submitted, $metadata) {
+    global $k_judgment_none;
+    $dbh = self::singleton();
+    try {
+      $dbh->beginTransaction();
+      $problem = self::querySelectUnique('select problem_id from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and alias = ?', $contest_id, $division_id, $filebase);
+      $problem_id = $problem['problem_id'];
+      $res = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = ?, metadata = ?, status = ?', $problem_id, $team_id, $payload, $time_submitted, $metadata, $k_judgment_none);
+      $dbh->commit();
+    }
+    catch (Exception $e) {
+      print $e->getMessage();
+      $dbh->rollBack();
+      $res = false;
+    }
+    return $res;
+  }
   
 }
 ?>

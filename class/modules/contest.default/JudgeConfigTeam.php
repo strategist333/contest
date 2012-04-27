@@ -23,16 +23,16 @@ class JudgeConfigTeam {
       dataType: "json"
     });
     $("#contest_id").change(function() {
-      $("#upload_form").attr('action', 'uploadteams.php?contest_id=' + $("#contest_id").val());
+      $("#upload_contest_id").val($("#contest_id").val());
       $("#teams tbody").empty();
-      $("#division_id option:selected").removeAttr("selected");
+      $("#divisions input:checked").removeAttr("checked");
       $.ajax({
         data: JSON.stringify({'action' : 'get_contest_divisions', 'contest_id' : $("#contest_id").val()}),
         success: function(ret) {
           if (ret['success']) {
-            $("#division_id option:selected").removeAttr("selected");
+            $("#divisions input:checked").removeAttr("checked");
             $.each(ret['division_ids'], function(index, val) {
-              $("#division_id option[value=" + val + "]").attr("selected", "selected");
+              $("#division_" + val).attr("checked", "checked");
             });
           }
         }
@@ -60,17 +60,14 @@ class JudgeConfigTeam {
     $("#contest_id").val($("#contest_id option:enabled").val()).change();
 <?php } ?>
     $("#download").click(function() {
-      window.location.assign("downloadteams.php?contest_id=" + $("#contest_id").val());
-    });
-    $("#upload").click(function() {
-      setTimeout(function () { window.location = "teams.php"; }, 2000);
-      return true;
+      window.location.assign("handlefile.php?action=download_teams&contest_id=" + $("#contest_id").val());
     });
   });
 })(window.jQuery);
 </script>
 <style>
 select { width: 200px; }
+iframe { border: 0px; width: 400px; height: 100px; }
 </style>
 </head>
 <body>
@@ -96,13 +93,13 @@ foreach (DBManager::getContestTypes() as $contest_type) {
     </td>
     <td>
       Linked divisions: <br />
-      <select id="division_id" size="20" multiple="multiple" disabled="disabled">
+      <div id="divisions">
 <?php
 foreach (DBManager::getDivisions() as $division) {
-  printf('<option value="%d">%s</option>', $division['division_id'], $division['division_name']);
+  printf('<input id="division_%d" type="checkbox" disabled="disabled">%s<br />', $division['division_id'], $division['division_name']);
 }
 ?>
-      </select>
+      </div>
     </td>
     <td>
       Teams: <br />
@@ -123,12 +120,15 @@ foreach (DBManager::getDivisions() as $division) {
     </td>
   </tr>
   <tr>
-    <td colspan="2" align="center">
+    <td colspan="3" align="center">
       Actions: <br />
       <button id="download">Download teams csv</button><br />
-      <form id="upload_form" action="uploadteams.php" method="post" enctype="multipart/form-data" target="_blank">
-        Select a teams csv file <input type="file" name="upload_teams_file"></input> to <input id="upload" type="submit" value="upload"></input>
+      <form action="handlefile.php" method="post" enctype="multipart/form-data" target="upload_frame">
+        Select a teams csv file <input type="file" name="upload_file"></input> to <input type="submit" value="upload"></input>
+        <input id="upload_contest_id" type="hidden" name="contest_id" value="0"></input>
+        <input type="hidden" name="action" value="upload_teams"></input>
       </form>
+      <iframe name="upload_frame"></iframe>
     </td>
   </tr>
     </td>
