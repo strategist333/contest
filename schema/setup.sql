@@ -99,10 +99,13 @@ CREATE TABLE `runs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Runs';
 
 CREATE TABLE `judgments` (
-  `judge_id` int(11) NOT NULL,
+  `judgment_id` int(11) NOT NULL AUTO_INCREMENT,
   `run_id` int(11) NOT NULL,
-  `time_judged` int(11) NOT NULL,
+  `time_updated` int(11) NOT NULL,
+  `judge_id` int(11) NOT NULL,
+  `metadata` text NOT NULL,
   `status` tinyint(3) NOT NULL,
+  PRIMARY KEY (`judgment_id`),
   FOREIGN KEY (`run_id`) REFERENCES `runs` (`run_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Judgments';
 

@@ -301,14 +301,21 @@ class DBManager {
     return $res;
   }
   
-  public static function addRun($team_id, $division_id, $contest_id, $filebase, $payload, $time_submitted, $metadata) {
+  public static function addRun($team_id, $division_id, $contest_id, $filebase, $payload, $metadata) {
+    global $k_run_active;
+    global $k_judge_none;
     global $k_judgment_none;
     $dbh = self::singleton();
     try {
       $dbh->beginTransaction();
       $problem = self::querySelectUnique('select problem_id from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and alias = ?', $contest_id, $division_id, $filebase);
       $problem_id = $problem['problem_id'];
-      $res = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = ?, metadata = ?, status = ?', $problem_id, $team_id, $payload, $time_submitted, $metadata, $k_judgment_none);
+      $run_id = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = unix_timestamp(), metadata = ?, status = ?', $problem_id, $team_id, $payload, $metadata, $k_run_active);
+      $update_count = self::queryUpdate('insert into judgments set judge_id = ?, run_id = ?, time_updated = unix_timestamp(), metadata = ?, status = ?', $k_judge_none, $run_id, '{}', $k_judgment_none);
+      if ($run_id == 0 || $update_count != 1) {
+        throw new Exception('Run and judgment not inserted');
+      }
+      $res = $run_id;
       $dbh->commit();
     }
     catch (Exception $e) {
@@ -317,6 +324,69 @@ class DBManager {
       $res = false;
     }
     return $res;
+  }
+  
+  public static function nextJudgeID() {
+    $dbh = self::singleton();
+    try {
+      $dbh->beginTransaction();
+      $info = self::querySelectUnique('select next_judge_id from globals');
+      $judge_id = $info['next_judge_id'];
+      $update_count = self::queryUpdate('update globals set next_judge_id = next_judge_id + 1');
+      if ($update_count != 1) {
+        throw new Exception('Judge ID not allocated');
+      }
+      $res = $judge_id;
+      $dbh->commit();
+    }
+    catch (Exception $e) {
+      $dbh->rollBack();
+      $res = false;
+    }
+    return $res;
+  }
+  
+  public static function fetchRun($judge_id, $contest_id) {
+    global $k_judgment_pending;
+    global $k_judgment_none;
+    global $k_judgment_maxdelay;
+    $print_error = true;
+    $dbh = self::singleton();
+    try {
+      $dbh->beginTransaction();
+      $existing_runs = self::querySelect('select run_id, judgment_id, problem_id, team_id, payload, time_submitted, runs.metadata as run_metadata from runs join judgments using (run_id) where judgments.judge_id = ? and judgments.status = ? limit 1', $judge_id, $k_judgment_pending);
+      if (count($existing_runs) == 0) {
+        $update_count = self::queryUpdate('update judgments set judge_id = ?, time_updated = unix_timestamp(), status = ? where status = ? or (status = ? and (unix_timestamp() - time_updated > ?)) order by run_id asc limit 1', $judge_id, $k_judgment_pending, $k_judgment_none, $k_judgment_pending, $k_judgment_maxdelay);
+        if ($update_count != 1) {
+          $print_error = false;
+          throw new Exception('Queue empty.');
+        }
+        $run_info = self::querySelectUnique('select run_id, judgment_id, problem_id, team_id, payload, time_submitted, runs.metadata as run_metadata from runs join judgments using (run_id) where judgments.judge_id = ? and judgments.status = ?', $judge_id, $k_judgment_pending);
+      }
+      else {
+        $run_info = $existing_runs[0];
+      }
+      
+      $problem_id = $run_info['problem_id'];
+      $team_id = $run_info['team_id'];
+      $problem_info = self::querySelectUnique('select problem_type, contests_divisions_problems.alias as alias, problems.metadata as problem_metadata, division_metadata, username as team_username from teams join divisions using (division_id) join contests_divisions_problems using (division_id) join problems using (problem_id) where team_id = ? and contest_id = ? and problem_id = ?', $team_id, $contest_id, $problem_id);
+      $res = array_merge($run_info, $problem_info);
+      $dbh->commit();
+    }
+    catch (Exception $e) {
+      if ($print_error) {
+        print $e->getMessage();
+      }
+      $dbh->rollBack();
+      $res = false;
+    }
+    return $res;
+  }
+  
+  public static function updateJudgment($judgment_id, $judge_id, $correct, $metadata) {
+    global $k_judgment_correct;
+    global $k_judgment_incorrect;
+    return self::queryUpdate('update judgments set time_updated = unix_timestamp(), metadata = ?, status = ? where judgment_id = ? and judge_id = ?', $metadata, ($correct ? $k_judgment_correct : $k_judgment_incorrect), $judgment_id, $judge_id);
   }
   
 }

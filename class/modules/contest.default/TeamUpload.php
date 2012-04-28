@@ -13,7 +13,10 @@ class TeamUpload {
     $this->contest_id = $contest_id;
   }
   
-  protected function getMetadata() {
+  protected function getMetadata() {    
+    $filename = $_FILES['team_file']['name'];
+    $path_parts = pathinfo($filename); 
+    $extension = $path_parts['extension'];
     return array('extension' => $extension);
   }
 
@@ -27,8 +30,6 @@ if (isset($_FILES['team_file']) && $_FILES['team_file']['size'] > 0) {
   $filename = $_FILES['team_file']['name'];
   $path_parts = pathinfo($filename); 
   $filebase = $path_parts['filename'];
-  $extension = $path_parts['extension'];
-  $time_submitted = time();
   
   $file = fopen($tmpname, 'r');
   $payload = fread($file, filesize($tmpname));  
@@ -37,7 +38,7 @@ if (isset($_FILES['team_file']) && $_FILES['team_file']['size'] > 0) {
   
   $metadata = $this->getMetadata();
   
-  $run_id = DBManager::addRun($this->team_id, $this->division_id, $this->contest_id, $filebase, $payload, $time_submitted, json_encode($metadata));
+  $run_id = DBManager::addRun($this->team_id, $this->division_id, $this->contest_id, $filebase, $payload, json_encode($metadata));
   if ($run_id) {
     $success = true;
   }

@@ -138,7 +138,7 @@ class JudgeConfigContest {
                   'contest_type' : $("#contest_type").val(),
                   'time_start' : Math.floor(new Date(parseInt($("#start_year").val()), parseInt($("#start_month").val()), parseInt($("#start_date").val()), parseInt($("#start_hour").val()), parseInt($("#start_minute").val()), 0, 0).getTime() / 1000),
                   'time_length' : parseInt($("#length_hour").val()) * 3600 + parseInt($("#length_minute").val()) * 60,
-                  'metadata' : metadata,
+                  'metadata' : JSON.stringify(metadata),
                   'tag' : $("#contest_tag").val()
                  };
       $.ajax({

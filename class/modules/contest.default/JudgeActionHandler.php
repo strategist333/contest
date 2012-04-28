@@ -25,7 +25,7 @@ class JudgeActionHandler {
     $time_start = $in['time_start'];
     $time_length = $in['time_length'];
     $tag = $in['tag'];
-    $metadata = json_encode($in['metadata']);
+    $metadata = $in['metadata'];
     if ($new_contest) {
       $contest_id = DBManager::addContest($contest_type, $contest_name, $time_start, $time_length, $tag, $metadata);
       if ($contest_id) {
@@ -159,6 +159,56 @@ class JudgeActionHandler {
     else {
       $out['success'] = false;
     }
+  }
+  
+  public function initialize_judge($in, &$out) {
+    global $g_curr_contest;
+    if ($g_curr_contest) {
+      $judge_id = DBManager::nextJudgeId();
+      if ($judge_id) {
+        $out = array_merge($out, $g_curr_contest);
+        $out['judge_id'] = $judge_id;
+        $out['metadata'] = json_decode($out['metadata'], true);
+      }
+      else {
+        $out['success'] = false;
+      }
+    }
+    else {
+      $out['success'] = false;
+    }
+  }
+  
+  public function fetch_task($in, &$out) {
+    global $g_curr_contest;
+    $judge_id = $in['judge_id'];
+    $contest_id = $in['contest_id'];
+    if ($g_curr_contest) {
+      if ($g_curr_contest['contest_id'] == $contest_id) {
+        $res = DBManager::fetchRun($judge_id, $contest_id);
+        if ($res) {
+          $out = array_merge($out, $res);
+          $out['task_type'] = 'grade';
+        }
+        else {
+          $out['task_type'] = 'poll';
+        }
+      }
+      else {
+        $out['task_type'] = 'reset';
+      }
+    }
+    else {
+      $out['task_type'] = 'halt';
+    }
+  }
+  
+  public function submit_judgment($in, &$out) {
+    $judgment_id = $in['judgment_id'];
+    $judge_id = $in['judge_id'];
+    $correct = $in['correct'];
+    $metadata = $in['metadata'];
+    $out['success'] = (DBManager::updateJudgment($judgment_id, $judge_id, $correct, $metadata) == 1);
   }
 }
 ?>

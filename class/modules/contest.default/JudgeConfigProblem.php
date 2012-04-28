@@ -121,13 +121,13 @@ class JudgeConfigProblem {
            .append($("<td>").text(divisionMap[divisionID]))
            .append($("<td>").append(makeCheck(problemID, divisionID, $("#contest_id").val(), problem['valid'])));
         loadRow(row, problemID, divisionID, $("#contest_id").val(), problem);
-        $("#problems tbody").append(row);
+        $("#problems > tbody").append(row);
       });
     }
     
     $("#contest_id").change(function() {
       $("#division_id option:selected").removeAttr("selected");
-      $("#problems tbody").empty();
+      $("#problems > tbody").empty();
       var contestID = $("#contest_id").val();
       $("#new_problem_division_id").empty();
       $.ajax({

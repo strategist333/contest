@@ -54,7 +54,7 @@ class TeamFrontend {
       if(filename.match(/\.(c|java|cc|cpp|py)$/)) {
         $("#submissions-upload-form").submit();
         $("#submissions-upload-status-ajax").text("Uploading..."); 
-        $("#submissions-upload-submit").attr("disabled","disabled");
+        //$("#submissions-upload-submit").attr("disabled","disabled");
         uploadTimerId = setTimeout(abortUpload, 30000);
       }
       else {

@@ -8,11 +8,13 @@
   
   $k_run_active = 1;
   
-  $k_judgment_invalid = 99;
   $k_judgment_none = 0;
   $k_judgment_pending = 1;
   $k_judgment_correct = 2;
+  $k_judgment_incorrect = 3;
+  
   $k_judgment_maxdelay = 15;
+  
   $k_judgments = array(
     "No judgment",
     "Judgment pending",
