@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/DBConstants.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'DBConstants.php');
 
 class DBManager {
   private static $singleton;

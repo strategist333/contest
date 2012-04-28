@@ -1,6 +1,6 @@
 <?php
-require_once(__DIR__ . '/../../common.php');
-require_once(__DIR__ . '/../../lib/parsecsv.lib.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'common.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'parsecsv.lib.php');
 
 class JudgeLoadHandler {
   

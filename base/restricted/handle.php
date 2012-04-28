@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../../class/common.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'common.php');
 
 $json = json_decode(file_get_contents('php://input'), true);
 

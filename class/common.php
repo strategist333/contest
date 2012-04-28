@@ -11,12 +11,12 @@ function currentContestType() {
 
 function loadClassInfo($curr_contest_type, $class_names, $params) {
 
-  $folders = array('contest.' . $curr_contest_type);
+  $folders = array('contest_' . $curr_contest_type);
   if ($curr_contest_type != 'default') {
-    array_push($folders, 'contest.default');
+    array_push($folders, 'contest_default');
   }
   foreach ($folders as $folder) {
-    $it = new RecursiveDirectoryIterator(__DIR__ . '/modules/' . $folder);
+    $it = new RecursiveDirectoryIterator(__DIR__ . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $folder);
     foreach (new RecursiveIteratorIterator($it) as $file) {
       if (in_array(basename($file, '.php'), $class_names)) {
         include_once($file);
