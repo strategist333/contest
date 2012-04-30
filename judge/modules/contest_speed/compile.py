@@ -5,6 +5,7 @@ from string import Template
 import subprocess
 import sys
 import shutil
+import tempfile
 import time
 import traceback
 
@@ -40,11 +41,12 @@ def compile(payload, src_filebase, src_extension, src_filename):
     src_file.flush()
     src_file.close()
 
-    utils.progress('Compiling')
+    utils.progress('Compiling ' + src_filename)
     compiler_cmd = languages[src_extension]['compiler'].substitute(src_filebase=src_filebase, src_filename=src_filename)
     if compiler_cmd is not None:
+      compiler_cmd = compiler_cmd.split()
       time_limit = languages[src_extension]['compile_time_limit']
-      compiler = subprocess.Popen(compiler_cmd.split(), stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+      compiler = subprocess.Popen(compiler_cmd, stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT, preexec_fn=os.setsid)
       start_time = time.time()
       while compiler.poll() is None and (time.time() - start_time < time_limit):
         time.sleep(0.5)
@@ -69,7 +71,7 @@ def grade(q, task, callback, **kwargs):
   metadata = {}
 
   try:
-    sandbox_dir = utils.setup_tmpdir()
+    sandbox_dir = tempfile.mkdtemp(prefix='proco')
     os.chdir(sandbox_dir)
 
     payload = task['payload']
@@ -83,10 +85,8 @@ def grade(q, task, callback, **kwargs):
   except GradingException, e:
     utils.progress(e.message)
     metadata['error'] = e.message
-  except Exception, e:
-    utils.progress('Internal error')
-    traceback.print_tb(sys.exc_info()[2])
-    sys.exit(1)
+  #except Exception, e:
+  #  utils.progress('Internal error')
   finally:
     shutil.rmtree(sandbox_dir)
 

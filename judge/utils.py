@@ -2,7 +2,6 @@
 import json
 import urllib2
 import sys
-import tempfile
 
 import config
 
@@ -17,13 +16,7 @@ def call(**kwargs):
     return json.loads(js)
   except Exception as e:
     print js
-    raise e
-
-def setup_tmpdir():
-  '''Makes a temporary directory for sandboxing.'''
-  
-  return tempfile.mkdtemp(prefix='proco')
-  
+    raise e  
 
 def progress(s):
   '''Outputs a progress indication.'''

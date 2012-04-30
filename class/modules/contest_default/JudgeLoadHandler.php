@@ -4,7 +4,7 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 
 class JudgeLoadHandler {
   
-  protected function writeDownloadFile($filename, $filepath) {
+  protected function writeDownloadHeader($filename, $length) {
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename=' . $filename);
@@ -12,10 +12,9 @@ class JudgeLoadHandler {
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
-    header('Content-Length: ' . filesize($filepath));
+    header('Content-Length: ' . $length);
     ob_clean();
     flush();
-    readfile($filepath);
   }
   
   public function download_teams() {
