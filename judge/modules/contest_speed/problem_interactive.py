@@ -38,7 +38,6 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
     utils.progress('Internal error when compiling grader')
     raise Exception(e)
   
-  
   time_limit = languages[team_extension]['executer_time_limit']
   num_test_cases = len(task['problem_metadata']['judge_io'])
 
@@ -53,18 +52,15 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
       team_input_fd, grader_output_fd = os.pipe()
       grader_input_fd, team_output_fd = os.pipe()
       
+      
       def team_init():
         os.setsid()
-        os.close(0)
-        os.close(1)
         os.dup2(team_input_fd, 0)
         os.dup2(team_output_fd, 1)
         os.execvp(team_executer_cmd[0], team_executer_cmd)
         
       def grader_init():
         os.setsid()
-        os.close(0)
-        os.close(1)
         os.dup2(grader_input_fd, 0)
         os.dup2(grader_output_fd, 1)
         os.execvp(grader_executer_cmd[0], grader_executer_cmd)
