@@ -6,6 +6,7 @@ import signal
 from string import Template
 import subprocess
 import time
+import tempfile
 
 import utils
 
@@ -22,17 +23,23 @@ languages = {
                 executer_time_limit=3)
 }
 
-def run_tests(task, src_filebase, src_extension, src_filename, metadata):
-  time_limit = languages[src_extension]['executer_time_limit']
+def run_tests(task, team_filebase, team_extension, team_filename, metadata):
+  '''Execute judge test cases.'''
+
+  time_limit = languages[team_extension]['executer_time_limit']
   num_test_cases = len(task['problem_metadata']['judge_io'])
 
   for index, test_case in enumerate(task['problem_metadata']['judge_io']):
-    executer_cmd = languages[src_extension]['executer'].substitute(src_filebase=src_filebase, src_filename=src_filename)
+    executer_cmd = languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename)
+    
+    stdin = tempfile.TemporaryFile(bufsize=10485760)
+    stdin.write(test_case['input'])
+    stdin.flush()
+    stdin.seek(0)
 
-    executer = subprocess.Popen(executer_cmd.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)
-    executer.stdin.write(test_case['input'])
-    executer.stdin.flush()
-    executer.stdin.close()
+    stdout = tempfile.TemporaryFile(bufsize=10485760)
+    
+    executer = subprocess.Popen(executer_cmd.split(), stdin=stdin, stdout=stdout, stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)
     start_time = time.time()
     while executer.poll() is None and (time.time() - start_time < time_limit):
       time.sleep(0.5)
@@ -40,8 +47,11 @@ def run_tests(task, src_filebase, src_extension, src_filename, metadata):
       os.killpg(executer.pid, signal.SIGKILL)
       raise GradingException('Time limit exceeded')
     if executer.returncode != 0:
-      raise GradingException('Run time error')
-    team_output = executer.stdout.read()
+      raise GradingException('Run time error %d' % executer.returncode)
+    
+    stdout.seek(0)
+    team_output = stdout.read()
+    
     if map(lambda line: line.strip(), team_output.split('\n')) != map(lambda line: line.strip(), test_case['output'].split('\n')):
       raise GradingException('Incorrect output')
     utils.progress('Passed %2d / %2d' % (index + 1, num_test_cases))
