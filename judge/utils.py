@@ -29,6 +29,9 @@ def progress(s):
   '''Outputs a progress indication.'''
   
   sys.stdout.write('\b' * progress.last_len)
+  sys.stdout.write(' ' * progress.last_len)
+  sys.stdout.write('\b' * progress.last_len)
+  
   sys.stdout.write(s)
   sys.stdout.flush()
   progress.last_len = len(s)

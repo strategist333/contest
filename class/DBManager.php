@@ -84,8 +84,8 @@ class DBManager {
   // Begin definition of procedures
   public static function getContestTypes() {
     $contest_types = array();
-    foreach (glob(__DIR__ . '/modules/contest.*') as $contest_full_type) {
-      array_push($contest_types, substr($contest_full_type, strrpos($contest_full_type, 'contest.') + strlen('contest.')));
+    foreach (glob(__DIR__ . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'contest_*') as $contest_full_type) {
+      array_push($contest_types, substr($contest_full_type, strrpos($contest_full_type, 'contest_') + strlen('contest_')));
     }
     return $contest_types;
   }
@@ -97,8 +97,8 @@ class DBManager {
     }
     $problem_types = array();
     foreach ($contest_types as $contest_type) {
-      foreach (glob(__DIR__ . '/modules/contest.' . $contest_type . '/problem.*') as $problem_full_type) {
-        array_push($problem_types, substr($problem_full_type, strrpos($problem_full_type, 'problem.') + strlen('problem.')));
+      foreach (glob(__DIR__ . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'contest_' . $contest_type . DIRECTORY_SEPARATOR . 'problem_*') as $problem_full_type) {
+        array_push($problem_types, substr($problem_full_type, strrpos($problem_full_type, 'problem_') + strlen('problem_')));
       }
     }
     return $problem_types;

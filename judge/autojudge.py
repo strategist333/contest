@@ -3,6 +3,7 @@ import importlib
 import json
 import multiprocessing
 import time
+import sys
 
 import config
 import utils
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     if task_type == 'grade':
       for key in ['run_metadata', 'problem_metadata', 'division_metadata']:
         task[key] = json.loads(task[key])
-      print 'grading run_id %s (team %s, problem %s) of type %s... ' % (task['run_id'], task['team_username'], task['alias'], task['problem_type']),
+      print 'Grading run_id %s (team %s, problem %s) of type %s... ' % (task['run_id'], task['team_username'], task['alias'], task['problem_type']),
       utils.reset_progress()
       module = _import_module(judge.contest_type, task['problem_type'])
       q = multiprocessing.Queue()
@@ -80,10 +81,12 @@ if __name__ == '__main__':
       judge.submit_judgment(task['judgment_id'], **result)
     elif task_type == 'reset':
       judge = Judge()
-      print 'reset judge to %s' % judge
-    elif task_type == 'reset':
-      judge = Judge()
-      
+      print 'Reset judge to %s' % judge
+    elif task_type == 'halt':
+      print 'Shutting down'
+      break
     elif task_type == 'poll':
-      print 'no tasks.'
+      print 'Waiting for task...',
+      sys.stdout.write('\r')
+      sys.stdout.flush()
       time.sleep(config.poll_interval)
