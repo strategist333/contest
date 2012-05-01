@@ -62,7 +62,7 @@ class SpeedProblemConfigMetadata extends ProblemConfigMetadata {
         <input type="hidden" name="contest_id" value="<?= $this->contest_id ?>"></input>
         <input type="hidden" name="action" value="upload_speed_zip"></input>
         <br />
-        <iframe name="<?= $uploadFrameID ?>" style="width: 200px; height: 30px; border: 0px;"></iframe>
+        <iframe name="<?= $uploadFrameID ?>" style="width: 300px; height: 30px; border: 0px;"></iframe>
       </form>
     </td>
   </tr>

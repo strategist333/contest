@@ -60,7 +60,6 @@ def compile(payload, src_filebase, src_extension, src_filename):
 
     if not os.path.exists(check_for):
       raise GradingException('Compiler error')
-      
 
 def grade(q, task, callback, **kwargs):
   '''Sets up a file-based submission for grading, then calls a callback for grading.

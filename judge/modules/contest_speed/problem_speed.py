@@ -38,11 +38,12 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
     stdin.seek(0)
 
     stdout = tempfile.TemporaryFile(bufsize=10485760)
-   
+    
     executer = subprocess.Popen(executer_cmd, stdin=stdin, stdout=stdout, stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)
     start_time = time.time()
     while executer.poll() is None and (time.time() - start_time < time_limit):
       time.sleep(0.5)
+    
     if executer.poll() is None:
       os.killpg(executer.pid, signal.SIGKILL)
       raise GradingException('Time limit exceeded')

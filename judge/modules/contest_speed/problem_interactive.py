@@ -44,61 +44,49 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
   for index, test_case in enumerate(task['problem_metadata']['judge_io']):
     input_fd, input_filename = tempfile.mkstemp()
     try:
-      input_file = open(input_filename, 'w')
-      input_file.write(test_case['input'])
-      input_file.flush()
-      input_file.close()
-    
-      team_input_fd, grader_output_fd = os.pipe()
-      grader_input_fd, team_output_fd = os.pipe()
+      with open(input_filename, 'w') as input_file:
+        input_file.write(test_case['input'])
+        input_file.flush()
+        input_file.close()
       
-      
-      def team_init():
-        os.setsid()
-        os.dup2(team_input_fd, 0)
-        os.dup2(team_output_fd, 1)
-        os.execvp(team_executer_cmd[0], team_executer_cmd)
+        team_input_fd, grader_output_fd = os.pipe()
+        grader_input_fd, team_output_fd = os.pipe()
         
-      def grader_init():
-        os.setsid()
-        os.dup2(grader_input_fd, 0)
-        os.dup2(grader_output_fd, 1)
-        os.execvp(grader_executer_cmd[0], grader_executer_cmd)
-      
-      team_executer_cmd = languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename).split()
-      grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
-      grader_executer_cmd.append(input_filename)
-      
-      team_executer = subprocess.Popen(team_executer_cmd, stderr=open(os.devnull, 'w'), preexec_fn=team_init)
-      
-      grader_executer = subprocess.Popen(grader_executer_cmd, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)
-      
-      grader_finished = False
-      team_finished = False
-      start_time = time.time()
-      
-      while not grader_finished and time.time() - start_time < time_limit:
-        time.sleep(0.5)
-        if grader_executer.poll() is not None:
-          grader_finished = True
-        if team_executer.poll() is not None:
-          team_finished = True
-        if grader_finished and team_finished:
-          break
+        def team_init():
+          os.setsid()
+          os.dup2(team_input_fd, 0)
+          os.dup2(team_output_fd, 1)
+          os.execvp(team_executer_cmd[0], team_executer_cmd)
           
-      if team_executer.poll() is None:
-        os.killpg(team_executer.pid, signal.SIGKILL)
-        raise GradingException('Time limit exceeded')
-      if team_executer.returncode != 0:
-        raise GradingException('Run time error')
-      
-      if grader_executer.poll() is None:
-        os.killpg(grader_executer.pid, signal.SIGKILL)
-        raise GradingException('Run time error')
-      if grader_executer.returncode != 0:
-        raise GradingException('Incorrect output')
-      
-      utils.progress('Passed %2d / %2d' % (index + 1, num_test_cases))
+        def grader_init():
+          os.setsid()
+          os.dup2(grader_input_fd, 0)
+          os.dup2(grader_output_fd, 1)
+          os.execvp(grader_executer_cmd[0], grader_executer_cmd)
+        
+        team_executer_cmd = languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename).split()
+        grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
+        grader_executer_cmd.append(input_filename)
+        
+        team_executer = subprocess.Popen(team_executer_cmd, stderr=open(os.devnull, 'w'), preexec_fn=team_init)
+        grader_executer = subprocess.Popen(grader_executer_cmd, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)
+        start_time = time.time()
+        while grader_executer.poll() is None and time.time() - start_time < time_limit:
+          time.sleep(0.5)
+            
+        if team_executer.poll() is None:
+          os.killpg(team_executer.pid, signal.SIGKILL)
+          raise GradingException('Time limit exceeded')
+        if team_executer.returncode != 0:
+          raise GradingException('Run time error')
+        
+        if grader_executer.poll() is None:
+          os.killpg(grader_executer.pid, signal.SIGKILL)
+          raise GradingException('Time limit exceeded')
+        if grader_executer.returncode != 0:
+          raise GradingException('Incorrect output')
+        
+        utils.progress('Passed %2d / %2d' % (index + 1, num_test_cases))
     finally:
       os.remove(input_filename)
   utils.progress('Correct')

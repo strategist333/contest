@@ -79,7 +79,7 @@ class InteractiveProblemConfigMetadata extends ProblemConfigMetadata {
         <input type="hidden" name="action" value="upload_interactive_zip"></input>
         <br />
       </form>
-      <iframe name="<?= $uploadFrameID ?>" style="width: 200px; height: 30px; border: 0px;"></iframe>
+      <iframe name="<?= $uploadFrameID ?>" style="width: 300px; height: 30px; border: 0px;"></iframe>
     </td>
   </tr>
 </table>

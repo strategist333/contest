@@ -265,6 +265,10 @@ class DBManager {
     return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, division_id asc', $contest_id);
   }
   
+  public static function getContestProblem($contest_id, $problem_id) {
+    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and problem_id = ? order by order_seq asc, division_id asc', $contest_id, $problem_id);
+  }
+  
   public static function modifyProblem($problem_id, $key, $value) {
     return self::queryUpdate('update problems set ' . $key . ' = ? where problem_id = ?', $value, $problem_id);
   }

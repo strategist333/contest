@@ -13,7 +13,7 @@
   $k_judgment_correct = 2;
   $k_judgment_incorrect = 3;
   
-  $k_judgment_maxdelay = 3;
+  $k_judgment_maxdelay = 30;
   
   $k_judgments = array(
     "No judgment",
