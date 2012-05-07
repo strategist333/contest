@@ -24,7 +24,7 @@ class TeamUpload {
 // BEGIN RENDER
 ?>
 <?php
-$success = false;
+$success = "false";
 if (isset($_FILES['team_file']) && $_FILES['team_file']['size'] > 0) {
   $tmpname = $_FILES['team_file']['tmp_name'];
   $filename = $_FILES['team_file']['name'];
@@ -40,11 +40,11 @@ if (isset($_FILES['team_file']) && $_FILES['team_file']['size'] > 0) {
   
   $run_id = DBManager::addRun($this->team_id, $this->division_id, $this->contest_id, $filebase, $payload, json_encode($metadata));
   if ($run_id) {
-    $success = true;
+    $success = "true";
   }
 }
 ?>
-<script type="text/javascript">window.top.location.stopUpload(<?= $success ?>);</script>
+<script type="text/javascript">window.top.location.stopUpload(<?php print $success; ?>);</script>
 <?php
 // END RENDER
   }

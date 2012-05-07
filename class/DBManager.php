@@ -57,7 +57,7 @@ class DBManager {
   private static function singleton() {
     if (!isset(self::$singleton)) {
       try {
-        self::$singleton = new PDO('mysql:host=localhost;dbname=contest', 'contest', 'proco', array(PDO::ATTR_PERSISTENT => true));
+        self::$singleton = new PDO('mysql:host=localhost;dbname=contest', 'contest', 'proco', array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
         self::$singleton->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       }
       catch (PDOException $e) {
@@ -105,7 +105,7 @@ class DBManager {
   }
 
   public static function getCurrentContest() {
-    return self::querySelectUnique('select contest_id, contest_type, contest_name, time_start, time_length, metadata, status from globals join contests on globals.curr_contest_id = contests.contest_id');
+    return self::querySelectUnique('select contest_id, contest_type, contest_name, time_start, time_length, metadata, status, unix_timestamp() as now from globals join contests on globals.curr_contest_id = contests.contest_id');
   }
   
   public static function login($username, $password) {
@@ -165,7 +165,7 @@ class DBManager {
     try {
       $dbh->beginTransaction();
       self::queryUpdate('delete from contests_divisions where contest_id = ?', $contest_id);
-      $res = self::queryUpdate('insert into contests_divisions (contest_id, division_id) values ' . implode(',', array_map(function($division_id) use ($contest_id) { return '(' . $contest_id . ',' . $division_id . ')'; }, $division_ids)));
+      $res = self::queryUpdate('insert into contests_divisions (contest_id, division_id, metadata) values ' . implode(',', array_map(function($division_id) use ($contest_id) { return '(' . $contest_id . ',' . $division_id . ',\'{}\')'; }, $division_ids)));
       $dbh->commit();
     }
     catch (Exception $e) {
@@ -174,9 +174,17 @@ class DBManager {
     }
     return $res;
   }
-  
+    
   public static function getContestDivisions($contest_id) {
     return self::querySelect('select division_id, division_name from contests_divisions join divisions using (division_id) where contest_id = ? order by division_name asc', $contest_id);
+  }
+  
+  public static function getContestDivisionMetadata($contest_id, $division_id) {
+    return self::querySelect('select metadata from contests_divisions where contest_id = ? and division_id = ?', $contest_id, $division_id);
+  }
+  
+  public static function modifyContestDivisionMetadata($contest_id, $division_id, $metadata) {
+    return self::queryUpdate('update contests_divisions set metadata = ? where contest_id = ? and division_id = ?', $metadata, $contest_id, $division_id);
   }
   
   public static function modifyDivision($division_id, $division_name) {
@@ -194,7 +202,7 @@ class DBManager {
       $tags = self::querySelectUnique('select tag from contests where contest_id = ?', $contest_id);
       $tag = $tags['tag'];
       
-      $divisions = self::querySelect('select division_id, division_name from divisions join contests_divisions using (division_id) where contest_id = ?', $contest_id);
+      $divisions = self::getContestDivisions($contest_id);
       $division_map = array();
       foreach ($divisions as $division) {
         $division_map[$division['division_name']] = $division['division_id'];
@@ -258,7 +266,7 @@ class DBManager {
   }
   
   public static function getContestTeams($contest_id) {
-    return self::querySelect('select team_id, tag, username, password, alias, division_name from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? order by division_name asc, username asc', $contest_id);
+    return self::querySelect('select team_id, tag, username, password, alias, division_id, division_name from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? order by division_name asc, username asc', $contest_id);
   }
   
   public static function getContestProblems($contest_id) {
@@ -323,7 +331,6 @@ class DBManager {
       $dbh->commit();
     }
     catch (Exception $e) {
-      print $e->getMessage();
       $dbh->rollBack();
       $res = false;
     }
@@ -393,5 +400,23 @@ class DBManager {
     return self::queryUpdate('update judgments set time_updated = unix_timestamp(), metadata = ?, status = ? where judgment_id = ? and judge_id = ?', $metadata, ($correct ? $k_judgment_correct : $k_judgment_incorrect), $judgment_id, $judge_id);
   }
   
+  public static function getContestJudgments($contest_id) {
+    global $k_judgment_correct;
+    global $k_judgment_incorrect;
+    // No transaction, to prevent blocking
+    $teams = self::getContestTeams($contest_id);
+    $team_ids = array();
+    foreach ($teams as $team) {
+      array_push($team_ids, $team['team_id']);
+    }
+    $problems = self::getContestProblems($contest_id);
+    $problem_ids = array();
+    foreach ($problems as $problem) {
+      array_push($problem_ids, $problem['problem_id']);
+    }
+    $judgments = self::querySelect('select team_id, problem_id, time_submitted, judgments.status as judgment from runs join judgments using (run_id) where (judgments.status = ? or judgments.status = ?) and team_id in (' . implode(',', $team_ids) . ') and problem_id in (' . implode(',', $problem_ids) . ') order by time_submitted asc', $k_judgment_incorrect, $k_judgment_correct);
+    
+    return array('teams' => $teams, 'problems' => $problems, 'judgments' => $judgments);
+  }
 }
 ?>

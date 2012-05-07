@@ -73,19 +73,19 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
         start_time = time.time()
         while grader_executer.poll() is None and time.time() - start_time < time_limit:
           time.sleep(0.5)
-            
+        
+        grader_finished = grader_executer.poll() is not None
+        if not grader_finished:
+          os.killpg(grader_executer.pid, signal.SIGKILL)
         if team_executer.poll() is None:
           os.killpg(team_executer.pid, signal.SIGKILL)
           raise GradingException('Time limit exceeded')
         if team_executer.returncode != 0:
           raise GradingException('Run time error')
-        
-        if grader_executer.poll() is None:
-          os.killpg(grader_executer.pid, signal.SIGKILL)
+        if not grader_finished:
           raise GradingException('Time limit exceeded')
         if grader_executer.returncode != 0:
           raise GradingException('Incorrect output')
-        
         utils.progress('Passed %2d / %2d' % (index + 1, num_test_cases))
     finally:
       os.remove(input_filename)

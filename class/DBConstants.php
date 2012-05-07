@@ -10,8 +10,8 @@
   
   $k_judgment_none = 0;
   $k_judgment_pending = 1;
-  $k_judgment_correct = 2;
-  $k_judgment_incorrect = 3;
+  $k_judgment_incorrect = 2;
+  $k_judgment_correct = 3;
   
   $k_judgment_maxdelay = 30;
   

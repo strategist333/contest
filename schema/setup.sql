@@ -55,6 +55,7 @@ CREATE TABLE `problems` (
 CREATE TABLE `contests_divisions` (
   `contest_id` int(11) NOT NULL,
   `division_id` int(11) NOT NULL,
+  `metadata` text NOT NULL,
   FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
   FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Contests_Divisions';
