@@ -27,6 +27,7 @@ class JudgeConfigContest {
 <title>Configure contest</title>
 <link href="/css/main.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.stringify.min.js"></script>
 <script type="text/javascript">
 (function ($) {
 
@@ -48,7 +49,7 @@ class JudgeConfigContest {
     }
     else {
       $.ajax({
-        data: JSON.stringify({'action' : 'load_contest', 'contest_id' : $("#contest_id").val()}),
+        data: $.stringifyJSON({'action' : 'load_contest', 'contest_id' : $("#contest_id").val()}),
         success: function(ret) {
           if (ret['success']) {
             $("#contest_name").val(ret['contest_name']);
@@ -96,7 +97,7 @@ class JudgeConfigContest {
     });
     $("#current").click(function() {
       $.ajax({
-        data: JSON.stringify({'action' : 'toggle_current_contest', 'contest_id' : $("#contest_id").val()}),
+        data: $.stringifyJSON({'action' : 'toggle_current_contest', 'contest_id' : $("#contest_id").val()}),
         success: function(ret) {
           if (ret['success']) {
             window.location = "contests.php?contest_type=" + $("#contest_type").val() + "&contest_id=" + $("#contest_id").val();
@@ -107,7 +108,7 @@ class JudgeConfigContest {
     $("#delete").click(function() {
       if (confirm("Are you sure you want to delete this contest?")) {
         $.ajax({
-          data: JSON.stringify({'action' : 'delete_contest', 'contest_id' : $("#contest_id").val()}),
+          data: $.stringifyJSON({'action' : 'delete_contest', 'contest_id' : $("#contest_id").val()}),
           success: function(ret) {
             if (ret['success']) {
               window.location = "contests.php?contest_type=" + $("#contest_type").val();
@@ -120,7 +121,7 @@ class JudgeConfigContest {
       var name = prompt("Give a name to the cloned contest:", $("#contest_name").val() + " copy");
       if (name) {
         $.ajax({
-          data: JSON.stringify({'action' : 'clone_contest', 'contest_id' : $("#contest_id").val(), 'contest_name' : name}),
+          data: $.stringifyJSON({'action' : 'clone_contest', 'contest_id' : $("#contest_id").val(), 'contest_name' : name}),
           success: function(ret) {
             if (ret['success']) {
               window.location = "contests.php?contest_type=" + $("#contest_type").val() + "&contest_id=" + ret['contest_id'];
@@ -138,11 +139,11 @@ class JudgeConfigContest {
                   'contest_type' : $("#contest_type").val(),
                   'time_start' : Math.floor(new Date(parseInt($("#start_year").val()), parseInt($("#start_month").val()), parseInt($("#start_date").val()), parseInt($("#start_hour").val()), parseInt($("#start_minute").val()), 0, 0).getTime() / 1000),
                   'time_length' : parseInt($("#length_hour").val()) * 3600 + parseInt($("#length_minute").val()) * 60,
-                  'metadata' : JSON.stringify(metadata),
+                  'metadata' : $.stringifyJSON(metadata),
                   'tag' : $("#contest_tag").val()
                  };
       $.ajax({
-        data: JSON.stringify(data),
+        data: $.stringifyJSON(data),
         success: function(ret) {
           if (ret['success']) {
             window.location = "contests.php?contest_type=" + $("#contest_type").val() + "&contest_id=" + ret['contest_id'];

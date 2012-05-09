@@ -13,6 +13,7 @@ class JudgeConfigDivision {
 <title>Configure division</title>
 <link href="/css/main.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.stringify.min.js"></script>
 <script type="text/javascript">
 (function ($) {
   $(document).ready(function() {
@@ -25,7 +26,7 @@ class JudgeConfigDivision {
     $("#contest_id").change(function() {
       $("#division_id option:selected").removeAttr("selected");
       $.ajax({
-        data: JSON.stringify({'action' : 'get_contest_divisions', 'contest_id' : $("#contest_id").val()}),
+        data: $.stringifyJSON({'action' : 'get_contest_divisions', 'contest_id' : $("#contest_id").val()}),
         success: function(ret) {
           if (ret['success']) {
             $.each(ret['division_ids'], function(index, val) {
@@ -44,7 +45,7 @@ class JudgeConfigDivision {
       var name = prompt("New division name:");
       if (name) {
         $.ajax({
-          data: JSON.stringify({'action' : 'add_division', 'division_name' : name}),
+          data: $.stringifyJSON({'action' : 'add_division', 'division_name' : name}),
           success: function(ret) {
             if (ret['success']) {
               $("#division_id").append($("<option>").val(ret['division_id']).text(name));
@@ -60,7 +61,7 @@ class JudgeConfigDivision {
         var name = prompt("New division name:");
         if (name) {
           $.ajax({
-            data: JSON.stringify({'action' : 'rename_division', 'division_id' : divisionID, 'division_name' : name}),
+            data: $.stringifyJSON({'action' : 'rename_division', 'division_id' : divisionID, 'division_name' : name}),
             success: function(ret) {
               if (ret['success']) {
                 options.eq(0).text(name);
@@ -80,7 +81,7 @@ class JudgeConfigDivision {
       });
         
       $.ajax({
-        data: JSON.stringify({'action' : 'link_divisions', 'contest_id' : $("#contest_id").val(), 'division_ids' : divisionIDs}),
+        data: $.stringifyJSON({'action' : 'link_divisions', 'contest_id' : $("#contest_id").val(), 'division_ids' : divisionIDs}),
         success: function(ret) {
           if (!ret['success']) {
             alert("Divisions not linked");

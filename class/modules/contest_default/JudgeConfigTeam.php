@@ -13,6 +13,7 @@ class JudgeConfigTeam {
 <title>Configure teams</title>
 <link href="/css/main.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.stringify.min.js"></script>
 <script type="text/javascript">
 (function ($) {
   $(document).ready(function() {
@@ -27,7 +28,7 @@ class JudgeConfigTeam {
       $("#teams tbody").empty();
       $("#divisions input:checked").removeAttr("checked");
       $.ajax({
-        data: JSON.stringify({'action' : 'get_contest_divisions', 'contest_id' : $("#contest_id").val()}),
+        data: $.stringifyJSON({'action' : 'get_contest_divisions', 'contest_id' : $("#contest_id").val()}),
         success: function(ret) {
           if (ret['success']) {
             $("#divisions input:checked").removeAttr("checked");
@@ -38,7 +39,7 @@ class JudgeConfigTeam {
         }
       });
       $.ajax({
-        data: JSON.stringify({'action' : 'get_contest_teams', 'contest_id' : $("#contest_id").val()}),
+        data: $.stringifyJSON({'action' : 'get_contest_teams', 'contest_id' : $("#contest_id").val()}),
         success: function(ret) {
           if (ret['success']) {
             $("#teams tbody").empty();

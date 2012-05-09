@@ -13,6 +13,7 @@ class JudgeConfigProblem {
 <title>Configure problem</title>
 <link href="/css/main.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.stringify.min.js"></script>
 <script type="text/javascript">
 
 (function ($) {  
@@ -47,7 +48,7 @@ class JudgeConfigProblem {
         var thisElem = $(this);
         thisElem.addClass('updating');
         $.ajax({
-          data: JSON.stringify({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : key, 'value' : $(this).val()}),
+          data: $.stringifyJSON({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : key, 'value' : $(this).val()}),
           success: function(ret) {
             if (ret['success']) {
               if (refresh) {
@@ -66,7 +67,7 @@ class JudgeConfigProblem {
       return $("<input type='checkbox'>").attr("checked", checked).change(function() {
         if ($(this).is(":checked")) {
           $.ajax({
-            data: JSON.stringify({'action' : 'enable_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID}),
+            data: $.stringifyJSON({'action' : 'enable_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID}),
             success: function(ret) {
               if (ret['success']) {
                 var problem = ret['problem'];
@@ -78,7 +79,7 @@ class JudgeConfigProblem {
         }
         else {
           $.ajax({
-            data: JSON.stringify({'action' : 'disable_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID}),
+            data: $.stringifyJSON({'action' : 'disable_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID}),
             success: function(ret) {
               if (ret['success']) {
                 var refresh = true;
@@ -107,7 +108,7 @@ class JudgeConfigProblem {
            .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'title', true)))
            .append($("<td>").append(makeProblemTypeDropdown(problemID, divisionID, contestID, problem, 'problem_type', true)))
            .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'url', false)))
-           .append($("<td>").load("problemmetadata.php", {'data' : JSON.stringify({'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'metadata' : problem['metadata'], 'division_metadata' : problem['division_metadata'], 'problem_type' : problem['problem_type']})}));
+           .append($("<td>").load("problemmetadata.php", {'data' : $.stringifyJSON({'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'metadata' : problem['metadata'], 'division_metadata' : problem['division_metadata'], 'problem_type' : problem['problem_type']})}));
       }
       else {
         row.append($("<td>").attr("colspan", 5).text("Not used"));
@@ -131,7 +132,7 @@ class JudgeConfigProblem {
       var contestID = $("#contest_id").val();
       $("#new_problem_division_id").empty();
       $.ajax({
-        data: JSON.stringify({'action' : 'get_contest_problems', 'contest_id' : contestID}),
+        data: $.stringifyJSON({'action' : 'get_contest_problems', 'contest_id' : contestID}),
         success: function(ret) {
           if (ret['success']) {
             $("#new_problem_division_id").empty();
@@ -173,7 +174,7 @@ class JudgeConfigProblem {
 <?php } ?>
     $("#new_problem").click(function() {
       $.ajax({
-        data: JSON.stringify({'action' : 'add_problem', 'contest_id' : $("#contest_id").val(), 'division_id' : $("#new_problem_division_id").val()}),
+        data: $.stringifyJSON({'action' : 'add_problem', 'contest_id' : $("#contest_id").val(), 'division_id' : $("#new_problem_division_id").val()}),
         success: function(ret) {
           if (ret['success']) {
             var problem = ret['problem'];

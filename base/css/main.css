@@ -41,7 +41,7 @@ html, body {
   z-index: 15;
 }
 
-.div-padding {
+.div_padding {
   padding: 0.5em;
 }
 .left {
@@ -80,7 +80,7 @@ html, body {
   text-shadow: #333 1px 1px 2px;
 }
 
-#header #timer-div {
+#header #timer_div {
   position: absolute;
   right: 0px;
   top: 0px;
@@ -92,14 +92,14 @@ html, body {
   -webkit-border-radius: 0 0 0 0.5em;
 }
 
-#logo-div {
+#logo_div {
   position: absolute;
   left: 0px;
   top: 0px;
   padding: 4px;
 }
 
-#footer #quote-marquee {
+#footer #quote_marquee {
   height: 18px;
   background: #f0f3fa;
   color: #C00;
@@ -108,7 +108,7 @@ html, body {
   font-family: cursive;
 }
 
-.div-title {
+.div_title {
   color: #000;
   padding: 0.3em; 
 	margin-bottom: 5px;
@@ -121,18 +121,18 @@ html, body {
   -webkit-border-radius: 0.5em;
 }
 
-#submissions-upload {
+#submissions_upload {
   height: 10em;
   text-align: center;
   overflow: visible;
   border-bottom: solid 1px;
 }
 
-#submissions-upload .form {
+#submissions_upload .form {
   overflow: hidden;
 }
 
-#submissions-upload-status {
+#submissions_upload_status {
   border: solid 1px;
   background: #EEF;
   text-align: center;
@@ -141,48 +141,48 @@ html, body {
   -webkit-border-radius: 0.5em;
 }
 
-#submissions-table-div {
+#submissions_table_div {
   background: #f0f3fa; 
   height: 50%;
   overflow-y: scroll;
 }
 
-#submissions-table {
+#submissions_table {
   margin: auto;
   width: 100%;
 }
 
-#scoreboard-table {
+#scoreboard_table {
   margin: auto;
   width: 100%;
 }
 
-#scoreboard-table-div  {
+#scoreboard_table_div  {
   background: #f0f3fa; 
   height: 50%;
   overflow-y: scroll;
   border-top: solid 2px;
 }
 
-#games-table-div {
+#games_table_div {
   background: #f0f3fa; 
   height: 40%;
   overflow-y: scroll;
 }
 
-#games-table {
+#games_table {
   margin: auto;
   width: 100%;
 }
 
-#games-visualizer-div {
+#games_visualizer_div {
   background: #FCF8F8; 
   height: 60%;
   overflow-y: scroll;
   border-top: solid 2px;
 }
 
-#games-visualizer-ajax {
+#games_visualizer_ajax {
   text-align: center;
 }
 
@@ -197,18 +197,18 @@ html, body {
   overflow-y: scroll;
 }
 
-#clarification-ajax {
+#clarification_ajax {
   font-size: 80%;
 }
 
-#ask-area {
+#ask_area {
 	background: #FFFFFF;
 }
 
 #problems {
 }
 
-#problems-info {
+#problems_info {
 	font-size: 80%;
   text-align: center;
 	margin: 0 0 0.5em 0;
@@ -244,36 +244,36 @@ html, body {
   color: #FFF;
 }
 
-.results-table td {
+.results_table td {
   text-align: center;
 }
 
-.table-head {
+.table_head {
   background: #f8f8dd;
 }
 
-.table-blank {
+.table_blank {
   background: #FFFFFF;
 }
 
-.table-row-correct {
+.table_row_correct {
   background: #CCFFCC;
 }
 
-.table-row-incorrect {
+.table_row_incorrect {
   background: #FFCCCC;
 }
 
-.table-cell-correct {
+.table_cell_correct {
   background: #CCFFCC;
 }
 
-.table-cell-incorrect {
+.table_cell_incorrect {
   background: #FFCCCC;
 }
 
 /* File selector styling */
-.SI-FILES-STYLIZED .cabinet
+.SI_FILES_STYLIZED .cabinet
 {
   height: 20px;
   position: relative;
@@ -281,7 +281,7 @@ html, body {
 	overflow: hidden;
 }
 
-.SI-FILES-STYLIZED .cabinet input.file
+.SI_FILES_STYLIZED .cabinet input.file
 {
 	position: absolute;
   top: 0; right: 129px;
@@ -292,7 +292,7 @@ html, body {
 	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
   z-index: 10;
 }
-.SI-FILES-STYLIZED .cabinet div.image
+.SI_FILES_STYLIZED .cabinet div.image
 {
   position: absolute;
   top: 0; left: 0;
@@ -303,7 +303,7 @@ html, body {
   z-index: 5;
 }
 
-.SI-FILES-STYLIZED .cabinet div.filename
+.SI_FILES_STYLIZED .cabinet div.filename
 {
   text-align: left;
   width: 100%;

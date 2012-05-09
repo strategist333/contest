@@ -327,21 +327,29 @@ class DBManager {
     global $k_run_active;
     global $k_judge_none;
     global $k_judgment_none;
+    $res = array('success' => false);
     try {
       self::begin();
       $problem = self::querySelectUnique('select problem_id from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and alias = ?', $contest_id, $division_id, $filebase);
-      $problem_id = $problem['problem_id'];
-      $run_id = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = unix_timestamp(), metadata = ?, status = ?', $problem_id, $team_id, $payload, $metadata, $k_run_active);
-      $update_count = self::queryUpdate('insert into judgments set judge_id = ?, run_id = ?, time_updated = unix_timestamp(), metadata = ?, status = ?', $k_judge_none, $run_id, '{}', $k_judgment_none);
-      if ($run_id == 0 || $update_count != 1) {
-        throw new Exception('Run and judgment not inserted');
+      if (!$problem) {
+        self::rollback();
+        $res['error'] = 'Invalid filename';
       }
-      $res = $run_id;
-      self::commit();
+      else {
+        $problem_id = $problem['problem_id'];
+        $run_id = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = unix_timestamp(), metadata = ?, status = ?', $problem_id, $team_id, $payload, $metadata, $k_run_active);
+        $update_count = self::queryUpdate('insert into judgments set judge_id = ?, run_id = ?, time_updated = unix_timestamp(), metadata = ?, status = ?', $k_judge_none, $run_id, '{}', $k_judgment_none);
+        if ($run_id == 0 || $update_count != 1) {
+          throw new Exception('Run and judgment not inserted');
+        }
+        self::commit();
+        $res['success'] = true;
+        $res['run_id'] = $run_id;
+      }
     }
     catch (Exception $e) {
       self::rollback();
-      $res = false;
+      $res['error'] = 'Internal error';
     }
     return $res;
   }
@@ -424,6 +432,10 @@ class DBManager {
     $judgments = self::querySelect('select team_id, problem_id, time_submitted, judgments.status as judgment from runs join judgments using (run_id) where (judgments.status = ? or judgments.status = ?) and team_id in (' . implode(',', $team_ids) . ') and problem_id in (' . implode(',', $problem_ids) . ') order by time_submitted asc', $k_judgment_incorrect, $k_judgment_correct);
     
     return array('teams' => $teams, 'problems' => $problems, 'judgments' => $judgments);
+  }
+  
+  public static function getTeamSubmissions($contest_id, $team_id, $division_id) {
+    return self::querySelect('select time_submitted, alias, title, judgments.status as judgment, judgments.metadata as judgment_metadata from runs join judgments using (run_id) join problems using (problem_id) join contests_divisions_problems using (problem_id) where contest_id = ? and team_id = ? and division_id = ? order by time_submitted desc', $contest_id, $team_id, $division_id);
   }
 }
 ?>

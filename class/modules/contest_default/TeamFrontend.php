@@ -7,10 +7,8 @@ class TeamFrontend {
 // BEGIN RENDER
 ?>
 
-<!-- IE quirks rendering mode trigger -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
-<html xmlns="http://www.w3.org/1999/xhtml">
-
+<!doctype html>
+<html>
 <head>
 <title><?= ($g_curr_contest ? ($g_curr_contest['contest_name'] . ' ') : '')?>Contest Portal</title>
 <link rel="shortcut icon" href="favicon.ico" />
@@ -43,24 +41,106 @@ class TeamFrontend {
   }
   
   protected function renderScripts() {
-// BEGN RENDER SCRIPTS
+    global $g_curr_contest;
+    global $k_judgment_none;
+    global $k_judgment_pending;
+    global $k_judgment_incorrect;
+    global $k_judgment_correct;
+    
+// BEGIN RENDER SCRIPTS
 ?>
+
+<script type="text/javascript" src="/js/jquery.ocupload.min.js"></script>
+<script type="text/javascript" src="/js/jquery.stringify.min.js"></script>
 <script type="text/javascript">
 (function($) {
-  $(document).ready(function() {
-    $("#submissions-upload-submit").click(function() {
-      // Check for preliminary valid file name
-      var filename = $("#submissions-upload-file").val().replace(/.*(\/|\\)(.*)/g, "$2");
-      if(filename.match(/\.(c|java|cc|cpp|py)$/)) {
-        $("#submissions-upload-form").submit();
-        $("#submissions-upload-status-ajax").text("Uploading..."); 
-        //$("#submissions-upload-submit").attr("disabled","disabled");
-        uploadTimerId = setTimeout(abortUpload, 30000);
-      }
-      else {
-        $("#submissions-upload-status-ajax").text("Invalid filename");
+  var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
+  var submissionsIntervalID = 0;
+  
+  function formatTime(ts) {
+    var ds = ts - contestStartTime;
+    var h = Math.floor(ds / 3600);
+    var m = Math.floor(ds % 3600 / 60);
+    var s = ds % 60;
+    var ar = $.map([h, m, s], function(elem) {
+      if (elem < 10) { return "0" + elem; }
+      return "" + elem;
+    })    
+    return ar.join(":");
+  }
+
+  function loadSubmissions() {
+    $.ajax({
+      data: $.stringifyJSON({'action' : 'load_submissions'}),
+      success: function(ret) {
+        if (ret['success']) {
+          var tbody = $("<tbody>");
+          var outstanding = 0;
+          $.each(ret['submissions'], function(index, submission) {
+            var tr = $("<tr>").append($("<td>").text(formatTime(submission['time_submitted'])))
+                              .append($("<td>").text(submission['alias']))
+                              .append($("<td>").text(submission['title']))
+                              .append($("<td>").text(submission['message']));
+            if (submission['judgment'] == <?= $k_judgment_correct ?>) {
+              tr.addClass('correct');
+            }
+            else if (submission['judgment'] == <?= $k_judgment_incorrect ?>) {
+              tr.addClass('incorrect');
+            }
+            else {
+              tr.addClass('pending');
+              outstanding++;
+            }
+            tbody.append(tr);
+          });
+          if (outstanding == 0 && ret['submissions'].length != 0) {
+            clearInterval(submissionsIntervalID);
+            submissionsIntervalID = setInterval(loadSubmissions, 180000);
+          }
+          else if (outstanding != 0) {
+            clearInterval(submissionsIntervalID);
+            submissionsIntervalID = setInterval(loadSubmissions, 5000);
+          }
+          $("#submissions_table > tbody").replaceWith(tbody);
+        }
       }
     });
+  }
+  $(document).ready(function() {
+    $.ajaxSetup({
+      url: "handle.php",
+      type: "post",
+      processData: false,
+      dataType: "json"
+    });
+    
+    $("#submissions_upload").upload({
+      name: 'team_file',
+      action: 'handlefile.php',
+      autoSubmit: false,
+      params: {'action' : 'upload_submission', 'MAX_FILE_SIZE' : 1000000},
+      onSelect: function() {
+        var filename = this.filename().replace(/.*(\/|\\)(.*)/g, "$2");
+        if (filename.match(/\.(c|java|cc|cpp|py)$/)) {
+          this.submit();
+        }
+        else {
+          $("#submissions_upload_status_ajax").text("Invalid extension");
+        }
+      },
+      onComplete: function(response) {
+        ret = $.parseJSON(response);
+        if (ret['success']) {
+          $("#submissions_upload_status_ajax").text("Select a file");
+          loadSubmissions();
+        }
+        else {
+          $("#submissions_upload_status_ajax").text(ret['error']);
+        }
+      }
+    });
+    submissionsIntervalID = setInterval(loadSubmissions, 1800000);
+    loadSubmissions();
   });
 })(window.jQuery);
 </script>
@@ -72,10 +152,10 @@ class TeamFrontend {
 // BEGIN RENDER HEADER
 ?>
 <div id="header">
-  <div id="timer-div">
+  <div id="timer_div">
     Contest is over
   </div>
-  <div id="logo-div">
+  <div id="logo_div">
   </div>
   <div id="title">
     <h1>Team Control Panel</h1>
@@ -90,7 +170,7 @@ class TeamFrontend {
 ?>
 <div id="footer">
 <span>
-  <div id="quote-marquee">
+  <div id="quote_marquee">
     &#8220;Beware of bugs in the above code; I have only proved it correct, not tried it.&#8221; &mdash; Donald Knuth
   </div>
 </span>
@@ -129,30 +209,11 @@ class TeamFrontend {
   protected function renderUpload() {
 // BEGIN RENDER UPLOAD
 ?>
-<div id="submissions-upload">
-  <div class="div-padding">
-    <div class="div-title">Submit a<br />Solution File:</div>
-    <div class="form">
-      <form id="submissions-upload-form" action="upload.php" method="post" enctype="multipart/form-data" target="submissions-upload-target"> 
-        <div class="cabinet"> 
-          <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-          <input type="file" class="file" id="submissions-upload-file" name="team_file" ></input>
-          <div class="image">
-          
-          </div>
-          <div class="filename" id="submissions-upload-filename">
-          </div>
-        </div>
-        <input type="button" id="submissions-upload-submit" value="Submit"></input><br />
-        <iframe id="submissions-upload-target" name="submissions-upload-target" src="#" style="width:0;height:0;border:0px solid #fff;"></iframe> 
-      </form>
-    </div>
-    <div id="submissions-upload-status">
-      <div id="submissions-upload-status-ajax">
-        No file uploaded
-      </div>
-    </div>
-
+<div id="upload">
+  <div class="div_padding">
+    <div class="div_title">Submit a<br />Solution File:</div>
+    <button id="submissions_upload" style="height: 30px; ">Upload</button>
+    <div id="submissions_upload_status">Select a file</div>
   </div>
 </div>
 <?php
@@ -163,9 +224,9 @@ class TeamFrontend {
 // BEGIN RENDER PROBLEMS
 ?>
 <div id="problems">
-  <div class="div-padding">
-    <div class="div-title">Problems</div>
-    <div id="problems-listing" class="listmenu">
+  <div class="div_padding">
+    <div class="div_title">Problems</div>
+    <div id="problems_listing" class="listmenu">
     </div>
   </div>
 </div>
@@ -176,11 +237,22 @@ class TeamFrontend {
   protected function renderSubmissions() {
 // BEGIN RENDER SUBMISSIONS
 ?>
-<div id="submissions-table-div">
-  <div class="div-padding">
-    <div class="div-title">Submission Results</div>
-    <div id="submissions-table-ajax">
-      <table id="submissions-table" class="results-table" style="margin: auto;" border="1" cellspacing="0"></table>
+<div id="submissions_table_div">
+  <div class="div_padding">
+    <div class="div_title">Submission Results</div>
+    <div id="submissions_table_ajax">
+      <table id="submissions_table" class="results_table" style="margin: auto;" border="1" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Problem</th>
+            <th>Title</th>
+            <th>Judgment</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -191,29 +263,28 @@ class TeamFrontend {
   protected function renderScoreboard() {
 // BEGIN RENDER SCOREBOARD
 ?>
-<div id="scoreboard-table-div">
-  <div class="div-padding">
-    <div class="div-title">Scoreboard</div>
-    <div id="scoreboard-table-ajax">
-      <table id="scoreboard-table" class="results-table" style="margin: auto;" border="1" cellspacing="0"></table>
+<div id="scoreboard_table_div">
+  <div class="div_padding">
+    <div class="div_title">Scoreboard</div>
+    <div id="scoreboard_table_ajax">
+      <table id="scoreboard_table" class="results_table" style="margin: auto;" border="1" cellspacing="0"></table>
     </div>
   </div>    
 </div>
 <?php
 // END RENDER SCOREBOARD
   }
-  
   protected function renderClarificationsPost() {
 // BEGIN RENDER CLARIFICATIONS POST
 ?>
 <div id="ask">   
-  <div class="div-padding">
-    <div class="div-title">Clarification Requests</div>
+  <div class="div_padding">
+    <div class="div_title">Clarification Requests</div>
     <form>
       <center>
-        <textarea style="width: 90%; margin: auto;" rows="5" id="ask-area"></textarea>
+        <textarea style="width: 90%; margin: auto;" rows="5" id="ask_area"></textarea>
         <br />
-        <input type="button" id="ask-submit" value="Submit Question"></input>
+        <input type="button" id="ask_submit" value="Submit Question"></input>
       </center>
     </form>
 
@@ -227,9 +298,9 @@ class TeamFrontend {
 // BEGIN RENDER CLARIFICATIONS VIEW
 ?>
 <div id="answers">
-  <div class="div-padding">  
-    <div class="div-title">Clarification History</div>
-    <div id="clarification-ajax">
+  <div class="div_padding">  
+    <div class="div_title">Clarification History</div>
+    <div id="clarification_ajax">
     </div>
   </div>  
 </div>
