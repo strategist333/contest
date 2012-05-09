@@ -7,7 +7,6 @@ import config
 
 def call(**kwargs):
   '''Helper function to POST a json call to config.handle_url.'''
-  
   req = urllib2.urlopen(config.handle_url, json.dumps(kwargs, separators=(',',':')))
   if not req:
     raise Exception('Failed to open connection.')

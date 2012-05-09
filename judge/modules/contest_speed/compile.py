@@ -84,9 +84,9 @@ def grade(q, task, callback, **kwargs):
   except GradingException, e:
     utils.progress(e.message)
     metadata['error'] = e.message
-  #except Exception, e:
-  #  utils.progress('Internal error')
+  except Exception, e:
+    utils.progress('Internal error')
   finally:
     shutil.rmtree(sandbox_dir)
 
-  q.put({'correct' : correct, 'metadata' : metadata})
+  q.put({'correct' : correct, 'metadata' : metadata, 'division_id' : int(task['division_id']), 'team_id' : int(task['team_id']), 'problem_id' : int(task['problem_id'])})

@@ -29,10 +29,10 @@ class Judge:
       raise Exception('Task not successfully fetched.');
     return js
     
-  def submit_judgment(self, judgment_id, correct, metadata):
+  def submit_judgment(self, judgment_id, correct, metadata, **kwargs):
     '''Submits the result of the grading task.'''
     
-    js = utils.call(action='submit_judgment', judgment_id=judgment_id, judge_id=self.judge_id, correct=correct, metadata=json.dumps(metadata, separators=(',',':')))
+    js = utils.call(action='submit_judgment', judgment_id=judgment_id, judge_id=self.judge_id, contest_id=self.contest_id, correct=correct, metadata=json.dumps(metadata, separators=(',',':')), **kwargs)
     if not js['success']:
       raise Exception('Judgment not successfully submitted.');
     return js
@@ -78,7 +78,7 @@ if __name__ == '__main__':
       result = q.get()
       grader.join()
       print
-      judge.submit_judgment(task['judgment_id'], **result)
+      judge.submit_judgment(judgment_id=int(task['judgment_id']), **result)
     elif task_type == 'reset':
       judge = Judge()
       print 'Reset judge to %s' % judge

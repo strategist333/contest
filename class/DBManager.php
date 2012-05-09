@@ -67,18 +67,19 @@ class DBManager {
     return self::$singleton;
   }
   
-  public static function transact($func) {
+  public static function begin() {
     $dbh = self::singleton();
-    try {
-      $dbh->beginTransaction();
-      $res = $func();
-      $dbh->commit();
-    }
-    catch (Exception $e) {
-      $dbh->rollBack();
-      $res = false;
-    }
-    return $res;
+    $dbh->beginTransaction();
+  }
+  
+  public static function commit() {
+    $dbh = self::singleton();
+    $dbh->commit();
+  }
+  
+  public static function rollback() {
+    $dbh = self::singleton();
+    $dbh->rollBack();
   }
   
   // Begin definition of procedures
@@ -161,15 +162,14 @@ class DBManager {
   }
   
   public static function linkContestsDivisions($contest_id, $division_ids) {
-    $dbh = self::singleton();
     try {
-      $dbh->beginTransaction();
+      self::begin();
       self::queryUpdate('delete from contests_divisions where contest_id = ?', $contest_id);
       $res = self::queryUpdate('insert into contests_divisions (contest_id, division_id, metadata) values ' . implode(',', array_map(function($division_id) use ($contest_id) { return '(' . $contest_id . ',' . $division_id . ',\'{}\')'; }, $division_ids)));
-      $dbh->commit();
+      self::commit();
     }
     catch (Exception $e) {
-      $dbh->rollBack();
+      self::rollback();
       $res = false;
     }
     return $res;
@@ -180,7 +180,11 @@ class DBManager {
   }
   
   public static function getContestDivisionMetadata($contest_id, $division_id) {
-    return self::querySelect('select metadata from contests_divisions where contest_id = ? and division_id = ?', $contest_id, $division_id);
+    $metadata = self::querySelectUnique('select metadata from contests_divisions where contest_id = ? and division_id = ?', $contest_id, $division_id);
+    if ($metadata) {
+      return $metadata['metadata'];
+    }
+    return false;
   }
   
   public static function modifyContestDivisionMetadata($contest_id, $division_id, $metadata) {
@@ -196,9 +200,8 @@ class DBManager {
   }
   
   public static function setTeams($contest_id, $teams) {
-    $dbh = self::singleton();
     try {
-      $dbh->beginTransaction();
+      self::begin();
       $tags = self::querySelectUnique('select tag from contests where contest_id = ?', $contest_id);
       $tag = $tags['tag'];
       
@@ -255,11 +258,11 @@ class DBManager {
         throw new Exception('Failed to delete');
       }
       
-      $dbh->commit();
+      self::commit();
       $res = array('success' => true, 'update' => $update_count, 'insert' => $insert_count, 'delete' => $delete_count);
     }
     catch (Exception $e) {
-      $dbh->rollBack();
+      self::rollback();
       $res = array('success' => false, 'error' => $e->getMessage());
     }
     return $res;
@@ -269,8 +272,16 @@ class DBManager {
     return self::querySelect('select team_id, tag, username, password, alias, division_id, division_name from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? order by division_name asc, username asc', $contest_id);
   }
   
+  public static function getContestDivisionTeams($contest_id, $division_id) {
+    return self::querySelect('select team_id, tag, username, password, alias from teams join tags using (tag) join divisions using (division_id) join contests_divisions using (division_id) join contests using (tag, contest_id) where contest_id = ? and division_id = ? order by username asc', $contest_id, $division_id);
+  }
+  
   public static function getContestProblems($contest_id) {
     return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, division_id asc', $contest_id);
+  }
+  
+  public static function getContestDivisionProblems($contest_id, $division_id) {
+    return self::querySelect('select problem_id, problem_type, title, status, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? order by order_seq asc', $contest_id, $division_id);
   }
   
   public static function getContestProblem($contest_id, $problem_id) {
@@ -299,15 +310,14 @@ class DBManager {
   
   public static function addProblem() {
     global $k_problem_active;
-    $dbh = self::singleton();
     try {
-      $dbh->beginTransaction();
+      self::begin();
       $res = self::queryInsert('insert into problems set status = ?, metadata = ?, order_seq = (select next_order_seq from globals)', $k_problem_active, '{}');
       self::queryUpdate('update globals set next_order_seq = next_order_seq + 1');
-      $dbh->commit();
+      self::commit();
     }
     catch (Exception $e) {
-      $dbh->rollBack();
+      self::rollback();
       $res = false;
     }
     return $res;
@@ -317,9 +327,8 @@ class DBManager {
     global $k_run_active;
     global $k_judge_none;
     global $k_judgment_none;
-    $dbh = self::singleton();
     try {
-      $dbh->beginTransaction();
+      self::begin();
       $problem = self::querySelectUnique('select problem_id from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and alias = ?', $contest_id, $division_id, $filebase);
       $problem_id = $problem['problem_id'];
       $run_id = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = unix_timestamp(), metadata = ?, status = ?', $problem_id, $team_id, $payload, $metadata, $k_run_active);
@@ -328,19 +337,18 @@ class DBManager {
         throw new Exception('Run and judgment not inserted');
       }
       $res = $run_id;
-      $dbh->commit();
+      self::commit();
     }
     catch (Exception $e) {
-      $dbh->rollBack();
+      self::rollback();
       $res = false;
     }
     return $res;
   }
   
   public static function nextJudgeID() {
-    $dbh = self::singleton();
     try {
-      $dbh->beginTransaction();
+      self::begin();
       $info = self::querySelectUnique('select next_judge_id from globals');
       $judge_id = $info['next_judge_id'];
       $update_count = self::queryUpdate('update globals set next_judge_id = next_judge_id + 1');
@@ -348,10 +356,10 @@ class DBManager {
         throw new Exception('Judge ID not allocated');
       }
       $res = $judge_id;
-      $dbh->commit();
+      self::commit();
     }
     catch (Exception $e) {
-      $dbh->rollBack();
+      self::rollback();
       $res = false;
     }
     return $res;
@@ -362,9 +370,8 @@ class DBManager {
     global $k_judgment_none;
     global $k_judgment_maxdelay;
     $print_error = true;
-    $dbh = self::singleton();
     try {
-      $dbh->beginTransaction();
+      self::begin();
       $existing_runs = self::querySelect('select run_id, judgment_id, problem_id, team_id, payload, time_submitted, runs.metadata as run_metadata from runs join judgments using (run_id) where judgments.judge_id = ? and judgments.status = ? limit 1', $judge_id, $k_judgment_pending);
       if (count($existing_runs) == 0) {
         $update_count = self::queryUpdate('update judgments set judge_id = ?, time_updated = unix_timestamp(), status = ? where status = ? or (status = ? and (unix_timestamp() - time_updated > ?)) order by run_id asc limit 1', $judge_id, $k_judgment_pending, $k_judgment_none, $k_judgment_pending, $k_judgment_maxdelay);
@@ -380,15 +387,15 @@ class DBManager {
       
       $problem_id = $run_info['problem_id'];
       $team_id = $run_info['team_id'];
-      $problem_info = self::querySelectUnique('select problem_type, contests_divisions_problems.alias as alias, problems.metadata as problem_metadata, division_metadata, username as team_username from teams join divisions using (division_id) join contests_divisions_problems using (division_id) join problems using (problem_id) where team_id = ? and contest_id = ? and problem_id = ?', $team_id, $contest_id, $problem_id);
+      $problem_info = self::querySelectUnique('select problem_id, problem_type, contests_divisions_problems.alias as alias, problems.metadata as problem_metadata, division_id, division_metadata, team_id, username as team_username from teams join divisions using (division_id) join contests_divisions_problems using (division_id) join problems using (problem_id) where team_id = ? and contest_id = ? and problem_id = ?', $team_id, $contest_id, $problem_id);
       $res = array_merge($run_info, $problem_info);
-      $dbh->commit();
+      self::commit();
     }
     catch (Exception $e) {
       if ($print_error) {
         print $e->getMessage();
       }
-      $dbh->rollBack();
+      self::rollback();
       $res = false;
     }
     return $res;
@@ -400,16 +407,16 @@ class DBManager {
     return self::queryUpdate('update judgments set time_updated = unix_timestamp(), metadata = ?, status = ? where judgment_id = ? and judge_id = ?', $metadata, ($correct ? $k_judgment_correct : $k_judgment_incorrect), $judgment_id, $judge_id);
   }
   
-  public static function getContestJudgments($contest_id) {
+  public static function getContestDivisionJudgments($contest_id, $division_id) {
     global $k_judgment_correct;
     global $k_judgment_incorrect;
     // No transaction, to prevent blocking
-    $teams = self::getContestTeams($contest_id);
+    $teams = self::getContestDivisionTeams($contest_id, $division_id);
     $team_ids = array();
     foreach ($teams as $team) {
       array_push($team_ids, $team['team_id']);
     }
-    $problems = self::getContestProblems($contest_id);
+    $problems = self::getContestDivisionProblems($contest_id, $division_id);
     $problem_ids = array();
     foreach ($problems as $problem) {
       array_push($problem_ids, $problem['problem_id']);
