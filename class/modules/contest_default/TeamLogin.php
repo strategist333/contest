@@ -33,7 +33,7 @@ class TeamLogin {
     array_push($bodyHTML, '<p><b><big>Now logged out.</big></b></p>');
   }
 ?>
-
+<!doctype html>
 <html>
 <head>
 <title>Log In</title>
@@ -48,7 +48,7 @@ class TeamLogin {
   $(document).ready( function() {
     $("#username-input").focus();
   });
-)(window.jQuery);
+})(window.jQuery);
 </script>
 <?php
   }

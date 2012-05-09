@@ -256,59 +256,18 @@ html, body {
   background: #FFFFFF;
 }
 
-.table_row_correct {
+tr.correct {
   background: #CCFFCC;
 }
 
-.table_row_incorrect {
+tr.incorrect {
   background: #FFCCCC;
 }
 
-.table_cell_correct {
+td.correct {
   background: #CCFFCC;
 }
 
-.table_cell_incorrect {
+td.incorrect {
   background: #FFCCCC;
-}
-
-/* File selector styling */
-.SI_FILES_STYLIZED .cabinet
-{
-  height: 20px;
-  position: relative;
-	display: block;
-	overflow: hidden;
-}
-
-.SI_FILES_STYLIZED .cabinet input.file
-{
-	position: absolute;
-  top: 0; right: 129px;
-	height: 20px;
-	width: auto;
-	opacity: 0;
-	-moz-opacity: 0;
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-  z-index: 10;
-}
-.SI_FILES_STYLIZED .cabinet div.image
-{
-  position: absolute;
-  top: 0; left: 0;
-  width: 80px;
-  height: 20px;
-  background: url(images/choose_file.png) 0 0 no-repeat;
-  cursor: pointer;
-  z-index: 5;
-}
-
-.SI_FILES_STYLIZED .cabinet div.filename
-{
-  text-align: left;
-  width: 100%;
-	position: absolute;
-  top: 0; left: 85px;
-  cursor: auto;
-  z-index: 15;
 }

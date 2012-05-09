@@ -210,8 +210,8 @@ print '<option value="0"' . ($contest_selected ? '' : ' selected="selected"') . 
   <tr>
     <td>Contest Length</td>
     <td>
-      <input type="text" id="length_hour" size="2" value="2" /> Hours&nbsp;
-      <input type="text" id="length_minute" size="2" value="0" /> Minutes
+      <input type="text" id="length_hour" size="2" value="2" /> hours&nbsp;
+      <input type="text" id="length_minute" size="2" value="0" /> minutes
     </td>
   </tr>
 <?php $this->renderMetadataTR(); ?>

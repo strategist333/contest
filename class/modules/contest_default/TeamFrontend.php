@@ -96,6 +96,7 @@ class TeamFrontend {
           if (outstanding == 0 && ret['submissions'].length != 0) {
             clearInterval(submissionsIntervalID);
             submissionsIntervalID = setInterval(loadSubmissions, 180000);
+            loadScoreboard();
           }
           else if (outstanding != 0) {
             clearInterval(submissionsIntervalID);
@@ -106,6 +107,43 @@ class TeamFrontend {
       }
     });
   }
+  
+  function loadScoreboard() {
+    $.ajax({
+      data: $.stringifyJSON({'action' : 'load_scoreboard'}),
+      success: function(ret) {
+        if (ret['success']) {
+          var scoreboard = ret['scoreboard'];
+          var thr = $("<tr>").append($("<th>").text("Rank"))
+                             .append($("<th>").text("Team"));
+          $.each(scoreboard['problems'], function(index, problem) {
+            thr.append($("<th>").text(problem['alias']));
+          });
+          thr.append($("<th>").text("Score"));
+          var tbody = $("<tbody>");
+          $.each(scoreboard['teams'], function(index, team) {
+            var tr = $("<tr>").append($("<td>").text(index + 1))
+                              .append($("<td>").text(team['alias']));
+            $.each(team['judgments'], function(index, judgment) {
+              var td = $("<td>").text(" ");
+              if (judgment == <?= $k_judgment_correct ?>) {
+                td.addClass('correct');
+              }
+              else if (judgment == <?= $k_judgment_incorrect ?>) {
+                td.addClass('incorrect');
+              }
+              tr.append(td);
+            });
+            tr.append($("<td>").text(team['score']));
+            tbody.append(tr);
+          });
+          $("#scoreboard_table > thead").replaceWith($("<thead>").append(thr));
+          $("#scoreboard_table > tbody").replaceWith(tbody);
+        }
+      }
+    });
+  }
+  
   $(document).ready(function() {
     $.ajaxSetup({
       url: "handle.php",
@@ -141,6 +179,8 @@ class TeamFrontend {
     });
     submissionsIntervalID = setInterval(loadSubmissions, 1800000);
     loadSubmissions();
+    setInterval(loadScoreboard, 15000);
+    loadScoreboard();
   });
 })(window.jQuery);
 </script>
@@ -267,7 +307,12 @@ class TeamFrontend {
   <div class="div_padding">
     <div class="div_title">Scoreboard</div>
     <div id="scoreboard_table_ajax">
-      <table id="scoreboard_table" class="results_table" style="margin: auto;" border="1" cellspacing="0"></table>
+      <table id="scoreboard_table" class="results_table" style="margin: auto;" border="1" cellspacing="0">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </div>
   </div>    
 </div>

@@ -30,10 +30,10 @@ class SpeedJudgeConfigContest extends JudgeConfigContest {
     parent::renderMetadataTR();
 ?>
     <tr>
-      <td>Scoreboard Freeze After</td>
+      <td>Scoreboard Freeze when</td>
       <td>
-        <input type="text" id="freeze_hour" size="2" value="1" /> Hours&nbsp;
-        <input type="text" id="freeze_minute" size="2" value="30" /> Minutes
+        <input type="text" id="freeze_hour" size="2" value="1" /> hours&nbsp;
+        <input type="text" id="freeze_minute" size="2" value="30" /> minutes remain
       </td>
     </tr>
 <?php

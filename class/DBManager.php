@@ -213,6 +213,7 @@ class DBManager {
       
       $valid_team_ids = array();
       
+      $dbh = self::singleton();
       $update_stmt = $dbh->prepare('update teams set username = ?, password = ?, alias = ?, tag = ?, division_id = ? where team_id = ?');
       $insert_stmt = $dbh->prepare('insert into teams set username = ?, password = ?, alias = ?, tag = ?, division_id = ?');
       

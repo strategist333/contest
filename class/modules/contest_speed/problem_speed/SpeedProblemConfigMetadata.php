@@ -31,7 +31,7 @@ class SpeedProblemConfigMetadata extends ProblemConfigMetadata {
     var thisElem = $(this);
     divisionMetadata['points'] = thisElem.val();
     $.ajax({
-      data: JSON.stringify({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : 'division_metadata', 'value' : JSON.stringify(divisionMetadata)}),
+      data: $.stringifyJSON({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : 'division_metadata', 'value' : $.stringifyJSON(divisionMetadata)}),
       success: function(ret) {
         if (ret['success']) {
           thisElem.removeClass('updating').addClass('updated');
