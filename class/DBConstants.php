@@ -44,6 +44,8 @@
   );
   
   $k_teams_fields = array('team_id', 'username', 'password', 'alias', 'division_name');
-  $k_problems_fields = array('problem_type', 'title', 'status', 'metadata');
+  $k_problems_fields = array('problem_type', 'title', 'status', 'metadata', 'order_seq');
   $k_contest_divisions_problems_fields = array('url', 'alias', 'point_value', 'division_metadata');
+  
+  $k_problems_grace_period = 5;
 ?>

@@ -30,7 +30,6 @@ class JudgeConfigProblem {
     var problemOrder = [];
     var problemDivisionMap = {};
     
-    
     function makeProblemTypeDropdown(problemID, divisionID, contestID, data, key, refresh) {
       var select = $("<select>");
       $.each(problemTypes, function(index, problemType) {
@@ -82,14 +81,17 @@ class JudgeConfigProblem {
             data: $.stringifyJSON({'action' : 'disable_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID}),
             success: function(ret) {
               if (ret['success']) {
-                var refresh = true;
+                var remove = true;
                 $.each(divisionMap, function(otherDivisionID, otherDivisionName) {
                   if ($("#problem_" + problemID + "_" + otherDivisionID).children("td:nth-child(3)").children("input").is(":checked")) {
-                    refresh = false;
+                    remove = false;
                   }
                 });
-                if (refresh) {
-                  $("#contest_id").change();
+                if (remove) {
+                  
+                  $.each(divisionMap, function(otherDivisionID, otherDivisionName) {
+                    $("#problem_" + problemID + "_" + otherDivisionID).remove();
+                  });
                 }
                 else {
                   var problem = {'valid' : false};
@@ -114,13 +116,34 @@ class JudgeConfigProblem {
         row.append($("<td>").attr("colspan", 5).text("Not used"));
       }
     }
+    
+    function reorderProblem(problemID, up) {
+      return function() {
+        $.ajax({
+          data: $.stringifyJSON({'action' : 'reorder_problem', 'problem_id' : problemID, 'up' : up}),
+          success: function() {
+            $("#contest_id").change();
+          }
+        });
+      }
+    }
+    
     function appendRows(problemID) {
+      var isFirst = true;
+      var contestID = $("#contest_id").val();
       $.each(divisionMap, function(divisionID, divisionName) {
         var problem = problemDivisionMap[problemID][divisionID];
         var row = $("<tr>").attr("id", "problem_" + problemID + "_" + divisionID);
-        row.append($("<td>").text(problemID))
-           .append($("<td>").text(divisionMap[divisionID]))
-           .append($("<td>").append(makeCheck(problemID, divisionID, $("#contest_id").val(), problem['valid'])));
+        var problemIDTD = $("<td>");
+        if (isFirst) {
+          row.append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'order_seq', true)));
+        }
+        else {
+          row.append($("<td>")).append($("<td>"));
+        }
+        row.append($("<td>").text(divisionMap[divisionID]))
+           .append($("<td>").append(makeCheck(problemID, divisionID, contestID, problem['valid'])));
+        isFirst = false;
         loadRow(row, problemID, divisionID, $("#contest_id").val(), problem);
         $("#problems > tbody").append(row);
       });
@@ -227,7 +250,7 @@ foreach (DBManager::getContestTypes() as $contest_type) {
       <table id="problems">
         <thead>
           <tr>
-            <td>Problem ID</td>
+            <td>Order</td>
             <td>Division</td>
             <td>Used</td>
             <td>Alias</td>

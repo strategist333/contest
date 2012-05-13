@@ -61,7 +61,7 @@ class JudgeConfigTeam {
     $("#contest_id").val($("#contest_id option:enabled").val()).change();
 <?php } ?>
     $("#download").click(function() {
-      window.location.assign("handlefile.php?action=download_teams&contest_id=" + $("#contest_id").val());
+      window.location.href = "handlefile.php?action=download_teams&contest_id=" + $("#contest_id").val();
     });
   });
 })(window.jQuery);

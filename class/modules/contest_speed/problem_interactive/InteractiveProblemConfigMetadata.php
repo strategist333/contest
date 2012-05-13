@@ -39,12 +39,12 @@ class InteractiveProblemConfigMetadata extends ProblemConfigMetadata {
     });
   });
   $("#<?= $downloadZipID ?>").click(function() {
-    window.location.assign("handlefile.php?action=download_interactive_zip&problem_id=" + problemID + "&division_id=" + divisionID + "&contest_id=" + contestID);
+    window.location.href = "handlefile.php?action=download_interactive_zip&problem_id=" + problemID + "&division_id=" + divisionID + "&contest_id=" + contestID;
   });
   $("#<?= $downloadGraderID ?>").click(function() {
-    window.location.assign("handlefile.php?action=download_interactive_grader&problem_id=" + problemID + "&division_id=" + divisionID + "&contest_id=" + contestID);
+    window.location.href = "handlefile.php?action=download_interactive_grader&problem_id=" + problemID + "&division_id=" + divisionID + "&contest_id=" + contestID;
   });
-})(<?php print $this->problem_id ?>, <?= $this->division_id ?>, <?= $this->contest_id ?>, <?= json_encode($this->metadata) ?>, <?= json_encode($this->division_metadata) ?>);
+})(<?= $this->problem_id ?>, <?= $this->division_id ?>, <?= $this->contest_id ?>, <?= json_encode($this->metadata) ?>, <?= json_encode($this->division_metadata) ?>);
 </script>
 <table>
   <tr>

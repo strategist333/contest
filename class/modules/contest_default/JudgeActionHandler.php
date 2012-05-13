@@ -210,5 +210,6 @@ class JudgeActionHandler {
     $metadata = $in['metadata'];
     $out['success'] = (DBManager::updateJudgment($judgment_id, $judge_id, $correct, $metadata) == 1);
   }
+  
 }
 ?>

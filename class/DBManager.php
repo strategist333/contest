@@ -278,15 +278,15 @@ class DBManager {
   }
   
   public static function getContestProblems($contest_id) {
-    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, division_id asc', $contest_id);
+    return self::querySelect('select problem_id, problem_type, title, order_seq, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, problem_id asc, division_id asc', $contest_id);
   }
   
   public static function getContestDivisionProblems($contest_id, $division_id) {
-    return self::querySelect('select problem_id, problem_type, title, status, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? order by order_seq asc', $contest_id, $division_id);
+    return self::querySelect('select problem_id, problem_type, title, order_seq, status, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? order by order_seq asc, problem_id asc', $contest_id, $division_id);
   }
   
   public static function getContestProblem($contest_id, $problem_id) {
-    return self::querySelect('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and problem_id = ? order by order_seq asc, division_id asc', $contest_id, $problem_id);
+    return self::querySelect('select problem_id, problem_type, title, order_seq, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and problem_id = ? order by order_seq asc, problem_id asc, division_id asc', $contest_id, $problem_id);
   }
   
   public static function modifyProblem($problem_id, $key, $value) {
@@ -298,7 +298,7 @@ class DBManager {
   }
   
   public static function getContestDivisionProblem($problem_id, $division_id, $contest_id) {
-    return self::querySelectUnique('select problem_id, problem_type, title, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and problem_id = ?', $contest_id, $division_id, $problem_id);
+    return self::querySelectUnique('select problem_id, problem_type, title, order_seq, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? and division_id = ? and problem_id = ?', $contest_id, $division_id, $problem_id);
   }
   
   public static function addContestDivisionProblem($problem_id, $division_id, $contest_id) {
