@@ -54,14 +54,17 @@ class TeamFrontend {
 <script type="text/javascript" src="/js/jquery.stringify.min.js"></script>
 <script type="text/javascript">
 (function($) {
+  var timerOffset = 0;
+  var timerOffsetCount = 0;
   var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
+  var contestEndTime = <?= $g_curr_contest['time_start'] + $g_curr_contest['time_length'] ?>;
   var submissionsIntervalID = 0;
+  var timerIntervalID = 0;
   
   function formatTime(ts) {
-    var ds = ts - contestStartTime;
-    var h = Math.floor(ds / 3600);
-    var m = Math.floor(ds % 3600 / 60);
-    var s = ds % 60;
+    var h = Math.floor(ts / 3600);
+    var m = Math.floor(ts % 3600 / 60);
+    var s = ts % 60;
     var ar = $.map([h, m, s], function(elem) {
       if (elem < 10) { return "0" + elem; }
       return "" + elem;
@@ -77,7 +80,7 @@ class TeamFrontend {
           var tbody = $("<tbody>");
           var outstanding = 0;
           $.each(ret['submissions'], function(index, submission) {
-            var tr = $("<tr>").append($("<td>").text(formatTime(submission['time_submitted'])))
+            var tr = $("<tr>").append($("<td>").text(formatTime(submission['time_submitted'] - contestStartTime)))
                               .append($("<td>").text(submission['alias']))
                               .append($("<td>").text(submission['title']))
                               .append($("<td>").text(submission['message']));
@@ -144,6 +147,54 @@ class TeamFrontend {
     });
   }
   
+  function getTime() {
+    var now = new Date();
+    return now.getTime() / 1000;
+  }
+  
+  function loadTime() {
+    var start = getTime();
+    $.get("time.php", function(time) {
+      var recv = getTime();
+      var expected = start + (recv - start) / 2;
+      var actual = parseFloat(time);
+      var offset = actual - expected;
+      timerOffset = (timerOffset * timerOffsetCount + offset) / (timerOffsetCount + 1);
+      timerOffsetCount++;
+      if (timerOffsetCount < 5) {
+        setTimeout(loadTime, 1000 + Math.floor(Math.random() * 10000));
+      }
+      if (timerIntervalID == 0) {
+        timerIntervalID = setInterval(refreshTimer, 500);
+      }
+      refreshTimer();
+    });
+  }
+  
+  function refreshTimer() {
+    var now = getTime();
+    if (now < contestEndTime) {
+      var timeLeft = 0;
+      var event;
+      if (now < contestStartTime) {
+        timeLeft = Math.ceil(contestStartTime - now);
+        event = "start";
+      }
+      else {
+        timeLeft = Math.ceil(contestEndTime - now);
+        event = "end";
+        if (!$("#problems_listing").is(":visible")) {
+          $("#problems_listing").load("problems.php").show();
+        }
+      }
+      $("#timer").text(formatTime(timeLeft) + " until " + event);
+    }
+    else {
+      $("#timer").text("Contest is over");
+    }
+    
+  }
+  
   $(document).ready(function() {
     $.ajaxSetup({
       url: "handle.php",
@@ -151,6 +202,9 @@ class TeamFrontend {
       processData: false,
       dataType: "json"
     });
+    
+    $("#problems_listing").hide();
+    loadTime();    
     
     $("#submissions_upload").upload({
       name: 'team_file',
@@ -192,11 +246,8 @@ class TeamFrontend {
 // BEGIN RENDER HEADER
 ?>
 <div id="header">
-  <div id="timer_div">
-    Contest is over
-  </div>
-  <div id="logo_div">
-  </div>
+  <div id="timer"></div>
+  <div id="logo_div"></div>
   <div id="title">
     <h1>Team Control Panel</h1>
   </div>
@@ -266,8 +317,7 @@ class TeamFrontend {
 <div id="problems">
   <div class="div_padding">
     <div class="div_title">Problems</div>
-    <div id="problems_listing" class="listmenu">
-    </div>
+    <div id="problems_listing" class="listmenu"></div>
   </div>
 </div>
 <?php
