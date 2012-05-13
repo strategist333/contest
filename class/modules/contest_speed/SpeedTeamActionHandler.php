@@ -17,7 +17,7 @@ class SpeedTeamActionHandler extends TeamActionHandler {
       }
       else {
         $team_scoreboard = SpeedScoreboardManager::generateScoreboard($contest_id, $division_id);
-        if ($team_scoreboard) {
+        if ($team_scoreboard !== false) {
           $out['scoreboard'] = $team_scoreboard;
           foreach ($out['scoreboard']['teams'] as &$teams) {
             unset($teams['team_id']);

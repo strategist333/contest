@@ -112,10 +112,14 @@ CREATE TABLE `judgments` (
 
 CREATE TABLE `posts` (
   `post_id` int(11) NOT NULL AUTO_INCREMENT,
-  `team_id` int(11) NOT NULL,
+  `contest_id` int(11) NOT NULL,
+  `team_id` int(11),
+  `ref_id` int(11),
   `text` text NOT NULL,
   `time_posted` int(11) NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`post_id`),
-  FOREIGN KEY (`team_id`) REFERENCES `teams` (`team_id`)
+  FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
+  FOREIGN KEY (`team_id`) REFERENCES `teams` (`team_id`),
+  FOREIGN KEY (`ref_id`) REFERENCES `posts` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Posts';

@@ -46,6 +46,11 @@ class TeamFrontend {
     global $k_judgment_pending;
     global $k_judgment_incorrect;
     global $k_judgment_correct;
+    global $k_post_unread;
+    global $k_post_read;
+    global $k_post_reply;
+    global $k_post_broadcast;
+    $metadata = json_decode($g_curr_contest['metadata'], true);
     
 // BEGIN RENDER SCRIPTS
 ?>
@@ -58,7 +63,10 @@ class TeamFrontend {
   var timerOffsetCount = 0;
   var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
   var contestEndTime = <?= $g_curr_contest['time_start'] + $g_curr_contest['time_length'] ?>;
+  var scoreboardFreezeTime = <?= $g_curr_contest['time_start'] + $metadata['time_freeze'] ?>;
   var submissionsIntervalID = 0;
+  var scoreboardIntervalID = 0;
+  var clarificationsIntervalID = 0;
   var timerIntervalID = 0;
   
   function formatTime(ts) {
@@ -192,7 +200,43 @@ class TeamFrontend {
     else {
       $("#timer").text("Contest is over");
     }
-    
+    if (now >= scoreboardFreezeTime && scoreboardIntervalID != 0) {
+      clearInterval(scoreboardIntervalID);
+      scoreboardIntervalID = 0;
+    }
+  }
+  
+  function getCanonicalTime(timeString) {
+    return timeString.substr(timeString.indexOf(':') - 2, 8);
+  }
+  
+  function loadClarifications() {
+    $.ajax({
+      data: $.stringifyJSON({'action' : 'get_clarifications'}),
+      success: function(ret) {
+        if (ret['success']) {
+          var container = $("<div>");
+          $.each(ret['clarifications'], function(index, message) {
+            var date = getCanonicalTime(new Date(message['time_posted'] * 1000).toTimeString());
+            var messageType = "";
+            switch (message['type']) {
+              case <?= $k_post_broadcast; ?>:
+                messageType = "Broadcast message";
+                break;
+              case <?= $k_post_reply; ?>:
+                messageType = "Reply";
+                break;
+              default:
+                messageType = "Asked";
+                break;
+            }
+            container.append($("<div>").append($("<h5>").text(messageType + " at " + date))
+                                       .append($("<span>").text(message['text'])));
+          });
+          $("#messages").empty().append(container);
+        }
+      }
+    });
   }
   
   $(document).ready(function() {
@@ -231,10 +275,23 @@ class TeamFrontend {
         }
       }
     });
+    
+    $("#ask_submit").click(function() {
+      var text = $.trim($("#ask_message").val());
+      if (text) {
+        $.ajax({
+          data: $.stringifyJSON({'action' : 'post_clarification', 'message' : text}),
+          success: loadClarifications
+        });
+      }
+      return false;
+    });
     submissionsIntervalID = setInterval(loadSubmissions, 1800000);
     loadSubmissions();
-    setInterval(loadScoreboard, 15000);
+    scoreboardIntervalID = setInterval(loadScoreboard, 15000);
     loadScoreboard();
+    clarificationsIntervalID = setInterval(loadClarifications, 30000);
+    loadClarifications();
   });
 })(window.jQuery);
 </script>
@@ -377,9 +434,9 @@ class TeamFrontend {
     <div class="div_title">Clarification Requests</div>
     <form>
       <center>
-        <textarea style="width: 90%; margin: auto;" rows="5" id="ask_area"></textarea>
+        <textarea id="ask_message" style="width: 90%; margin: auto;" rows="5"></textarea>
         <br />
-        <input type="button" id="ask_submit" value="Submit Question"></input>
+        <button id="ask_submit">Submit Question</button>
       </center>
     </form>
 
@@ -395,7 +452,7 @@ class TeamFrontend {
 <div id="answers">
   <div class="div_padding">  
     <div class="div_title">Clarification History</div>
-    <div id="clarification_ajax">
+    <div id="messages">
     </div>
   </div>  
 </div>

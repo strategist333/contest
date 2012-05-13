@@ -251,7 +251,7 @@ class DBManager {
       $update_stmt->closeCursor();
       $insert_stmt->closeCursor();
       
-      $delete_stmt = $dbh->prepare('delete from teams where division_id in (select division_id from contests_divisions where contest_id = ?) and tag = (select tag from contests where contest_id = ?) and team_id not in (' . implode(',', $valid_team_ids) . ')');
+      $delete_stmt = $dbh->prepare('delete from teams where division_id in (select division_id from contests_divisions where contest_id = ?) and tag = (select tag from contests where contest_id = ?)' . (count($valid_team_ids) > 0 ? (' and team_id not in (' . implode(',', $valid_team_ids) . ')') :  ''));
       $delete_stmt->execute(array($contest_id, $contest_id));
       $delete_count = $delete_stmt->rowCount();
       
@@ -430,13 +430,49 @@ class DBManager {
     foreach ($problems as $problem) {
       array_push($problem_ids, $problem['problem_id']);
     }
-    $judgments = self::querySelect('select team_id, problem_id, time_submitted, judgments.status as judgment from runs join judgments using (run_id) where (judgments.status = ? or judgments.status = ?) and team_id in (' . implode(',', $team_ids) . ') and problem_id in (' . implode(',', $problem_ids) . ') order by time_submitted asc', $k_judgment_incorrect, $k_judgment_correct);
+    $judgments = array();
+    if (count($team_ids) > 0 && count($problem_ids) > 0) {
+      $judgments = self::querySelect('select team_id, problem_id, time_submitted, judgments.status as judgment from runs join judgments using (run_id) where (judgments.status = ? or judgments.status = ?) and team_id in (' . implode(',', $team_ids) . ') and problem_id in (' . implode(',', $problem_ids) . ') order by time_submitted asc', $k_judgment_incorrect, $k_judgment_correct);
+    }
     
     return array('teams' => $teams, 'problems' => $problems, 'judgments' => $judgments);
   }
   
   public static function getTeamSubmissions($contest_id, $team_id, $division_id) {
     return self::querySelect('select time_submitted, alias, title, judgments.status as judgment, judgments.metadata as judgment_metadata from runs join judgments using (run_id) join problems using (problem_id) join contests_divisions_problems using (problem_id) where contest_id = ? and team_id = ? and division_id = ? order by time_submitted desc', $contest_id, $team_id, $division_id);
+  }
+  
+  public static function addPost($contest_id, $team_id, $message) {
+    global $k_post_unread;
+    return self::queryInsert('insert into posts set contest_id = ?, team_id = ?, text = ?, time_posted = unix_timestamp(), status = ?', $contest_id, $team_id, $message, $k_post_unread);
+  }
+  
+  public static function readPost($post_id) {
+    global $k_post_read;
+    return self::queryUpdate('update posts set status = ? where post_id = ?', $k_post_read, $post_id);
+  }
+  
+  public static function replyPost($contest_id, $team_id, $ref_id, $message) {
+    global $k_post_reply;
+    return self::queryInsert('insert into posts set contest_id = ?, team_id = ?, ref_id = ?, text = ?, time_posted = unix_timestamp(), status = ?', $contest_id, $team_id, $ref_id, $message, $k_post_reply);
+  }
+  
+  public static function broadcastPost($contest_id, $message) {
+    global $k_post_broadcast;
+    return self::queryInsert('insert into posts set contest_id = ?, text = ?, time_posted = unix_timestamp(), status = ?', $contest_id, $message, $k_post_broadcast);
+  }
+  
+  public static function getTeamPosts($contest_id, $team_id) {
+    global $k_post_broadcast;
+    return self::querySelect('select post_id, ref_id, text, time_posted, status from posts where contest_id = ? and (team_id = ? or status = ?) order by time_posted desc, post_id desc', $contest_id, $team_id, $k_post_broadcast);
+  }
+  
+  public static function getContestPosts($contest_id, $statuses) {
+    $posts = array();
+    if (count($statuses) > 0) {
+      $posts = self::querySelect('select post_id, team_id, username, ref_id, text, time_posted, posts.status as status from posts left join teams using (team_id) where contest_id = ? and posts.status in (' . implode(',', $statuses) . ') order by time_posted desc, post_id desc', $contest_id);
+    }
+    return $posts;
   }
 }
 ?>

@@ -210,6 +210,30 @@ class JudgeActionHandler {
     $metadata = $in['metadata'];
     $out['success'] = (DBManager::updateJudgment($judgment_id, $judge_id, $correct, $metadata) == 1);
   }
+    
+  public function get_posts($in, &$out) {
+    $contest_id = $in['contest_id'];
+    $statuses = $in['statuses'];
+    $out['posts'] = DBManager::getContestPosts($contest_id, $statuses);
+  }
   
+  public function read_post($in, &$out) {
+    $post_id = $in['post_id'];
+    $out['success'] = (DBManager::readPost($post_id) == 1);
+  }
+  
+  public function reply_post($in, &$out) {
+    $contest_id = $in['contest_id'];
+    $team_id = $in['team_id'];
+    $ref_id = $in['ref_id'];
+    $message = $in['message'];
+    $out['success'] = (DBManager::replyPost($contest_id, $team_id, $ref_id, $message) == 1);
+  }
+  
+  public function broadcast_post($in, &$out) {
+    $contest_id = $in['contest_id'];
+    $message = $in['message'];
+    $out['success'] = (DBManager::broadcastPost($contest_id, $message) == 1);
+  }
 }
 ?>
