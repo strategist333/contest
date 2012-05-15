@@ -1,0 +1,26 @@
+
+.left, .middle, .right	{
+  height: 80%;
+} /* to overcome child selector */
+
+
+.left {
+  width: 235px; 
+}
+.middle {
+  background: #FEE; 
+  position: absolute;
+  width: auto;
+  min-width: 350px;
+  left: 0; right: 465;
+  margin: 50px 230px 33px 235px;
+}
+
+.div_padding {
+  padding: 0px;
+}
+
+#footer {
+  bottom: 0; left: 0;
+  width: 100%;
+}

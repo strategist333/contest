@@ -9,10 +9,28 @@ class DebugTeamFrontend extends TeamFrontend {
 <div id="upload">
   <div class="div_padding">
      <div class="div_title">Submit Solution</div>
-     <select name="problem_id">
+     <div>
+       Problem:
+       <select name="problem_id">
 
-     </select>
-     
+       </select>
+     </div>
+     <div>
+       Solution:
+       <select name="solution_type">
+         <option value="correct">Always Correct</option>
+         <option value="sometimes">Sometimes Wrong</option>
+         <option value="wrong">Always Wrong</option>
+       </select>
+     </div>
+     <div>
+        Good Input:
+        <textarea style="width:95%;height:100px" name="good"></textarea>
+     </div>
+     <div>
+        Bad Input:
+        <textarea style="width:95%;height:100px" name="bad"></textarea>
+     </div>
   </div>
 </div>
 <?php
