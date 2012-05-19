@@ -33,12 +33,11 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_filebase = task['problem_metadata']['grader']['filebase']
     grader_extension = task['problem_metadata']['grader']['extension']
     grader_filename = grader_filebase + '.' + grader_extension
-    modules.contest_debug.compile.compile.(payload, grader_filebase, grader_extension, grader_filename)
+    modules.contest_speed.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
   except Exception, e:
     utils.progress('Internal error when compiling grader')
     raise Exception(e)
 
-  
 
 def grade(q, task, **kwargs):
   # Grades a debugging submission
