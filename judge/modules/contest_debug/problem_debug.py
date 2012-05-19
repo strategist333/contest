@@ -47,9 +47,11 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
 
     # run grader on correct data
+    utils.progress("Running on good input")
+
     grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, preexec_fn=grader_init)    
     start_time = time.time()
-    grader_executer.stdin.write(team_correct)
+    grader_executer.communicate(team_correct)
     while grader_executer.poll() is None and time.time() - start_time < time_limit:
       time.sleep(0.5)
     grader_finished = grader_executer.poll() is not None
@@ -59,9 +61,11 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
       correctStatus = True
 
     # run grader on wrong data
+    utils.progress("Running on bad input")
+
     grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, preexec_fn=grader_init)
     start_time = time.time()
-    grader_executer.stdin.write(team_wrong)
+    grader_executer.communicate(team_wrong)
     while grader_executer.poll() is None and time.time() - start_time < time_limit:
       time.sleep(0.5) 
     grader_finished = grader_executer.poll() is not None
@@ -72,23 +76,17 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
 
     # correct
     if(task['division_metadata']['type'] == "correct"):
-      if(correctStatus != True):
-        raise GradingException('Incorrect')
-      else:
+      if(correctStatus == True):
         result = True
 
     # wrong  
     if(task['division_metadata']['type'] == "wrong"):
-      if(wrongStatus != True):
-        raise GradingException('Incorrect')
-      else:
+      if(wrongStatus == True):
         result = True
 
     # sometimes  
     if(task['division_metadata']['type'] == "sometimes"):
-      if(correctStatus != True or wrongStatus != True):
-        raise GradingException('Incorrect')
-      else:
+      if(correctStatus == True and wrongStatus == True):
         result = True
 
   except Exception, e:
@@ -97,6 +95,8 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
 
   if(result == True):
     utils.progress("Correct")
+  else:
+    utils.progress("Incorrect")
 
   return result
 

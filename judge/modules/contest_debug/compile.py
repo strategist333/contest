@@ -83,7 +83,7 @@ def grade(q, task, callback, **kwargs):
     utils.progress(e.message)
     metadata['error'] = e.message
   except Exception, e:
-    utils.progress('Internal error' + str(e))
+    utils.progress('Internal error: ' + str(e))
   finally:
     shutil.rmtree(sandbox_dir)
 
