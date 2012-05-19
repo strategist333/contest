@@ -12,7 +12,17 @@ class DebugTeamFrontend extends TeamFrontend {
      <div>
        Problem:
        <select name="problem_id">
+<?php
+$contest_id = $_SESSION['login']['contest_id'];
+$division_id = $_SESSION['login']['division_id'];
 
+$problems = DBManager::getContestDivisionProblems($contest_id, $division_id);
+foreach($problems as $problem) {
+?>
+        <option value="<?=$problem['problem_id']?>"><?=$problem['title']?></option>
+<?php
+}
+?>
        </select>
      </div>
      <div>
