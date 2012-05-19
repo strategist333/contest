@@ -4,7 +4,6 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 
 class DebugTeamActionHandler extends TeamActionHandler {
 
-
 }
 
 ?>

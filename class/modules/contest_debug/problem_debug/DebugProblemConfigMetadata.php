@@ -28,11 +28,13 @@ class DebugProblemConfigMetadata extends ProblemConfigMetadata {
 ?>
 <script type="text/javascript">
 (function (problemID, divisionID, contestID, metadata, divisionMetadata) {
-  $("#<?= $pointsID ?>").keydown(function() {
+  $("#<?= $pointsID ?>, #<?= $typeID ?>").keydown(function() {
     $(this).addClass('updating');
   }).change(function() {
     var thisElem = $(this);
-    divisionMetadata['points'] = thisElem.val();
+    divisionMetadata['points'] = $("#<?= $pointsID ?>").val();
+    divisionMetadata['type'] = $("#<?= $typeID ?>").val();
+
     $.ajax({
       data: JSON.stringify({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : 'division_metadata', 'value' : JSON.stringify(divisionMetadata)}),
       success: function(ret) {
