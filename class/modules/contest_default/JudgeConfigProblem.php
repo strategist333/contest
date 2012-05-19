@@ -139,7 +139,7 @@ class JudgeConfigProblem {
           row.append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'order_seq', true)));
         }
         else {
-          row.append($("<td>")).append($("<td>"));
+          row.append($("<td>"));
         }
         row.append($("<td>").text(divisionMap[divisionID]))
            .append($("<td>").append(makeCheck(problemID, divisionID, contestID, problem['valid'])));
