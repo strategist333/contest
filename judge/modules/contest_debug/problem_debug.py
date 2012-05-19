@@ -10,6 +10,7 @@ import time
 import traceback
 import sys
 import utils
+import pipes
 
 languages = {
   'c'    : dict(executer=Template('./$src_filebase'),
@@ -26,6 +27,7 @@ languages = {
 
 def run_tests(task, team_select, team_correct, team_wrong, metadata):
   # Compiles the judge cleanly and executes the test case on the judge
+  result = False
 
   time_limit = 5
   try:
@@ -35,18 +37,68 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_filename = grader_filebase + '.' + grader_extension
     modules.contest_debug.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
 
-    # Testing Correct Input
-    #if(task['division_metadata']['type'] == "correct" || task['division_metadata']['type'] == "sometimes"):
+    def grader_init():
+      os.setsid()
+      os.execvp(grader_executer_cmd[0], grader_executer_cmd)
 
-    # Testing Wrong Input
-    #if(task['division_metadata']['type'] == "wrong" || task['division_metadata']['type'] == "sometimes"):
+    correctStatus = False   # Was the supposedly correct input actually correct?
+    wrongStatus = False     # Was the supposedly wrong input actually wrong?
 
+    grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
+
+    # run grader on correct data
+    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, preexec_fn=grader_init)    
+    start_time = time.time()
+    grader_executer.stdin.write(team_correct)
+    while grader_executer.poll() is None and time.time() - start_time < time_limit:
+      time.sleep(0.5)
+    grader_finished = grader_executer.poll() is not None
+    if not grader_finished:
+      os.killpg(grader_executer.pid, signal.SIGKILL)
+    if grader_executer.returncode == 1:
+      correctStatus = True
+
+    # run grader on wrong data
+    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, preexec_fn=grader_init)
+    start_time = time.time()
+    grader_executer.stdin.write(team_wrong)
+    while grader_executer.poll() is None and time.time() - start_time < time_limit:
+      time.sleep(0.5) 
+    grader_finished = grader_executer.poll() is not None
+    if not grader_finished:
+      os.killpg(grader_executer.pid, signal.SIGKILL)
+    if grader_executer.returncode == 2:
+      wrongStatus = True
+
+    # correct
+    if(task['division_metadata']['type'] == "correct"):
+      if(correctStatus != True):
+        raise GradingException('Incorrect')
+      else:
+        result = True
+
+    # wrong  
+    if(task['division_metadata']['type'] == "wrong"):
+      if(wrongStatus != True):
+        raise GradingException('Incorrect')
+      else:
+        result = True
+
+    # sometimes  
+    if(task['division_metadata']['type'] == "sometimes"):
+      if(correctStatus != True or wrongStatus != True):
+        raise GradingException('Incorrect')
+      else:
+        result = True
 
   except Exception, e:
     utils.progress('Internal error when compiling grader.')
     raise Exception(e)
 
-  return True
+  if(result == True):
+    utils.progress("Correct")
+
+  return result
 
 
 def grade(q, task, **kwargs):
