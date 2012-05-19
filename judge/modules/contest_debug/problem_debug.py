@@ -33,10 +33,20 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_filebase = task['problem_metadata']['grader']['filebase']
     grader_extension = task['problem_metadata']['grader']['extension']
     grader_filename = grader_filebase + '.' + grader_extension
-    modules.contest_speed.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
+    modules.contest_debug.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
+
+    # Testing Correct Input
+    #if(task['division_metadata']['type'] == "correct" || task['division_metadata']['type'] == "sometimes"):
+
+    # Testing Wrong Input
+    #if(task['division_metadata']['type'] == "wrong" || task['division_metadata']['type'] == "sometimes"):
+
+
   except Exception, e:
-    utils.progress('Internal error when compiling grader')
+    utils.progress('Internal error when compiling grader.')
     raise Exception(e)
+
+  return True
 
 
 def grade(q, task, **kwargs):

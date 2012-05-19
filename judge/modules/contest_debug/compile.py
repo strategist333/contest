@@ -35,13 +35,14 @@ languages = {
 
 def compile(payload, src_filebase, src_extension, src_filename):
   '''Compile a payload in the current working directory.'''
-  
+
   with open(src_filename, 'w+') as src_file:
     src_file.write(payload)
     src_file.flush()
     src_file.close()
 
     utils.progress('Compiling ' + src_filename)
+
     compiler_cmd = languages[src_extension]['compiler'].substitute(src_filebase=src_filebase, src_filename=src_filename)
     if compiler_cmd is not None:
       compiler_cmd = compiler_cmd.split()
@@ -62,10 +63,6 @@ def compile(payload, src_filebase, src_extension, src_filename):
       raise GradingException('Compiler error')
 
 def grade(q, task, callback, **kwargs):
-  '''Sets up a file-based submission for grading, then calls a callback for grading.
-  
-  Sets up a sandbox directory, compiles the program, and calls the callback function for grading.'''
-
   correct = False
   metadata = {}
 
@@ -73,7 +70,14 @@ def grade(q, task, callback, **kwargs):
     sandbox_dir = tempfile.mkdtemp(prefix='proco')
     os.chdir(sandbox_dir)
 
-    correct = callback(task, team_select, team_correct, team_wrong, metadata)
+    team_select = task['run_metadata']['type']
+    team_correct = task['run_metadata']['good']
+    team_wrong = task['run_metadata']['bad']
+
+    if task['division_metadata']['type'] == task['run_metadata']['type']:
+      correct = callback(task, team_select, team_correct, team_wrong, metadata)
+    else:
+      utils.progress("Wrong (Solution Type mismatch)")
 
   except GradingException, e:
     utils.progress(e.message)
