@@ -11,7 +11,7 @@ class DebugTeamFrontend extends TeamFrontend {
      <div class="div_title">Submit Solution</div>
      <div>
        Problem:
-       <select name="problem_id">
+       <select id="problem_id">
 <?php
 $contest_id = $_SESSION['login']['contest_id'];
 $division_id = $_SESSION['login']['division_id'];
@@ -19,7 +19,7 @@ $division_id = $_SESSION['login']['division_id'];
 $problems = DBManager::getContestDivisionProblems($contest_id, $division_id);
 foreach($problems as $problem) {
 ?>
-        <option value="<?=$problem['problem_id']?>"><?=$problem['title']?></option>
+        <option value="<?=$problem['alias']?>"><?=$problem['alias']?> <?=$problem['title']?></option>
 <?php
 }
 ?>
@@ -27,7 +27,7 @@ foreach($problems as $problem) {
      </div>
      <div>
        Solution:
-       <select name="solution_type" id="soln_type">
+       <select id="soln_type">
          <option value="correct">Always Correct</option>
          <option value="sometimes">Sometimes Wrong</option>
          <option value="wrong">Always Wrong</option>
@@ -35,12 +35,13 @@ foreach($problems as $problem) {
      </div>
      <div>
         Good Input:
-        <textarea style="width:95%;height:100px" id="soln_good" name="good"></textarea>
+        <textarea style="width:95%;height:100px" id="soln_good"></textarea>
      </div>
      <div>
         Bad Input:
-        <textarea style="width:95%;height:100px" id="soln_bad" name="bad"></textarea>
+        <textarea style="width:95%;height:100px" id="soln_bad"></textarea>
      </div>
+     <div style="text-align:center;font-size:13px;margin:6px;padding:6px;background-color:#ddffff" id="submissions_status_ajax"></div>
      <div style="text-align:center">
         <input type="submit" value="Submit Solution" onClick="submitDebugSolution()">
      </div>
@@ -49,8 +50,23 @@ foreach($problems as $problem) {
 <script type="text/javascript">
 
 function submitDebugSolution() {
+  $("#submissions_status_ajax").text("Submitting solution...");
   $.ajax({
-    data: $.stringifyJSON({'action': 
+    data: $.stringifyJSON({
+     'action': 'submit_debug_solution',
+     'problem_id': $('#problem_id').val(),
+     'type': $('#soln_type').val(),
+     'good': $('#soln_good').val(),
+     'bad': $('#soln_bad').val(),
+    }),
+    success: function(response) {
+      if(response['success']) {
+        $("#submissions_status_ajax").text("Solution submitted. Waiting for judging.");
+        setTimeout('$("#submissions_status_ajax").text("")', 5000);
+      } else {
+        $("#submissions_status_ajax").text("Solution submission failed. Please contact contest staff.");
+      }
+    }
   });
 }
 
