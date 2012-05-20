@@ -286,11 +286,11 @@ class TeamFrontend {
       }
       return false;
     });
-    submissionsIntervalID = setInterval(loadSubmissions, 1800000);
+    submissionsIntervalID = setInterval(loadSubmissions, 5000);
     loadSubmissions();
-    scoreboardIntervalID = setInterval(loadScoreboard, 15000);
+    scoreboardIntervalID = setInterval(loadScoreboard, 5000);
     loadScoreboard();
-    clarificationsIntervalID = setInterval(loadClarifications, 30000);
+    clarificationsIntervalID = setInterval(loadClarifications, 5000);
     loadClarifications();
   });
 })(window.jQuery);

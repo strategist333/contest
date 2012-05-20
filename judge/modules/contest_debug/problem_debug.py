@@ -57,7 +57,7 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_finished = grader_executer.poll() is not None
     if not grader_finished:
       os.killpg(grader_executer.pid, signal.SIGKILL)
-    if grader_executer.returncode == 1:
+    if grader_executer.returncode == 100:
       correctStatus = True
 
     # run grader on wrong data
@@ -71,7 +71,7 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_finished = grader_executer.poll() is not None
     if not grader_finished:
       os.killpg(grader_executer.pid, signal.SIGKILL)
-    if grader_executer.returncode == 2:
+    if grader_executer.returncode == 200:
       wrongStatus = True
 
     # correct
