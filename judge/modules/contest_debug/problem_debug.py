@@ -49,7 +49,7 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     # run grader on correct data
     utils.progress("Running on good input")
 
-    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, preexec_fn=grader_init)    
+    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)    
     start_time = time.time()
     grader_executer.communicate(team_correct)
     while grader_executer.poll() is None and time.time() - start_time < time_limit:
@@ -63,7 +63,7 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     # run grader on wrong data
     utils.progress("Running on bad input")
 
-    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, preexec_fn=grader_init)
+    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)
     start_time = time.time()
     grader_executer.communicate(team_wrong)
     while grader_executer.poll() is None and time.time() - start_time < time_limit:

@@ -104,6 +104,7 @@ class TeamFrontend {
             }
             tbody.append(tr);
           });
+	/*
           if (outstanding == 0 && ret['submissions'].length != 0) {
             clearInterval(submissionsIntervalID);
             submissionsIntervalID = setInterval(loadSubmissions, 180000);
@@ -113,6 +114,7 @@ class TeamFrontend {
             clearInterval(submissionsIntervalID);
             submissionsIntervalID = setInterval(loadSubmissions, 5000);
           }
+	*/
           $("#submissions_table > tbody").replaceWith(tbody);
         }
       }
