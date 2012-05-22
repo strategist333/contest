@@ -99,6 +99,7 @@ class TeamFrontend {
             }
             tbody.append(tr);
           });
+	/*
           if (outstanding == 0 && ret['submissions'].length != 0) {
             clearInterval(submissionsIntervalID);
             submissionsIntervalID = setInterval(loadSubmissions, 180000);
@@ -108,6 +109,7 @@ class TeamFrontend {
             clearInterval(submissionsIntervalID);
             submissionsIntervalID = setInterval(loadSubmissions, 5000);
           }
+	*/
           $("#submissions_table > tbody").replaceWith(tbody);
         }
       }
@@ -286,11 +288,11 @@ class TeamFrontend {
       }
       return false;
     });
-    submissionsIntervalID = setInterval(loadSubmissions, 1800000);
+    submissionsIntervalID = setInterval(loadSubmissions, 5000);
     loadSubmissions();
-    scoreboardIntervalID = setInterval(loadScoreboard, 15000);
+    scoreboardIntervalID = setInterval(loadScoreboard, 5000);
     loadScoreboard();
-    clarificationsIntervalID = setInterval(loadClarifications, 30000);
+    clarificationsIntervalID = setInterval(loadClarifications, 5000);
     loadClarifications();
   });
 })(window.jQuery);

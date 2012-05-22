@@ -12,15 +12,16 @@ $json = json_decode(file_get_contents('php://input'), true);
 $ret = array('success' => false);
 if (isset($json['action'])) {
   $action = $json['action'];
-  
+
   try {
     $handler = load(currentContestType(), 'TeamActionHandler');
-    if (method_exists($handler, $action)) { 
+    if (method_exists($handler, $action)) {
       $ret['success'] = true;
       call_user_func_array(array($handler, $action), array($json, &$ret));
     }
   } catch (Exception $e) {
     $ret['success'] = false;
+    $ret['message'] = $e->getMessage();
   }
 }
 

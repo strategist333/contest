@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'common.php');
 
-class SpeedJudgeConfigContest extends JudgeConfigContest {
+class DebugJudgeConfigContest extends JudgeConfigContest {
   
   public function renderMetadataLoadDefaultJS() {
     parent::renderMetadataLoadJS();
@@ -33,10 +33,11 @@ class SpeedJudgeConfigContest extends JudgeConfigContest {
       <td>Scoreboard Freeze when</td>
       <td>
         <input type="text" id="freeze_hour" size="2" value="1" /> hours&nbsp;
-        <input type="text" id="freeze_minute" size="2" value="30" /> minutes into contest.
+        <input type="text" id="freeze_minute" size="2" value="30" /> minutes into contest
       </td>
     </tr>
 <?php
   }
 }
 ?>
+
