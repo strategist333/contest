@@ -51,7 +51,7 @@ function loadWithPrefix($curr_contest_type, $prefix, $base_class_name) {
 
 function footer() {
   print <<<HEREDOC
-<hr><p><small>
+<p><small>
 Copyright (c) 2010-12 Frank Li<br>
 </small></p>
 HEREDOC;

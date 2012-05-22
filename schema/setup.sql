@@ -47,7 +47,7 @@ CREATE TABLE `problems` (
   `problem_type` varchar(32) NOT NULL DEFAULT 'default',
   `title` varchar(128) NOT NULL DEFAULT '',
   `order_seq` int(11) NOT NULL,
-  `metadata` text NOT NULL,
+  `metadata` longtext NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Problems';

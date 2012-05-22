@@ -17,6 +17,9 @@ class SpeedScoreboardManager {
       $problem_map = array();
       $empty_judgments = array();
       foreach ($info['problems'] as $problem) {
+        if ($problem['problem_type'] != 'speed' && $problem['problem_type'] != 'interactive') {
+          continue;
+        }
         $division_metadata = json_decode($problem['division_metadata'], true);
         $problem_map[$problem['problem_id']] = array('index' => count($problems), 'point_value' => $division_metadata['points']);
         array_push($problems, array('problem_id' => intval($problem['problem_id']), 'alias' => $problem['alias']));
@@ -57,7 +60,7 @@ class SpeedScoreboardManager {
       $contest_metadata = json_decode($g_curr_contest['metadata'], true);
       $metadata = array('judge_scoreboard' => $scoreboard, 'problems' => $problems);
       $team_scoreboard = array();
-      if (!isset($contest_metadata['time_freeze']) || $g_curr_contest['time_start'] + $contest_metadata['time_freeze'] > time()) {
+      if (!isset($contest_metadata['time_freeze']) || (time() < $g_curr_contest['time_start'] + $g_curr_contest['time_length'] - $contest_metadata['time_freeze'])) {
         foreach ($scoreboard as $team) {
           array_push($team_scoreboard, array('team_id' => $team['team_id'], 'alias' => $team['alias'], 'score' => $team['score'], 'judgments' => $team['judgments']));
         }
@@ -86,6 +89,9 @@ class SpeedScoreboardManager {
       }
       if ($problem_index >= count($metadata['problems'])) {
         throw new Exception('Problem not found');
+      }
+      if (!isset($metadata['team_scoreboard'])) {
+        throw new Exception('Scoreboard not found');
       }
       for ($team_index = 0; $team_index < count($metadata['team_scoreboard']); $team_index++) {
         if ($metadata['team_scoreboard'][$team_index]['team_id'] == $team_id) {

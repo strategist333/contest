@@ -26,7 +26,7 @@ class ProblemTeamDisplay {
   public function render() {
 // BEGIN RENDER
 ?>
-<a href="<?= $this->url ?>" target="_blank"><?= $this->alias . ' ' . $this->title ?></a><br />
+<a href="<?= $this->url ?>" target="_blank"><?= $this->alias . ' - ' . $this->title ?></a><br />
 <?php
 // END RENDER
   }

@@ -12,7 +12,12 @@ html, body {
   border: 0;
   min-width: 750px;
   min-height: 600px;
-  font-family: Tahoma;
+  background: #fff;
+}
+
+html, body, textarea {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
 }
 
 #container {
@@ -26,18 +31,56 @@ html, body {
   top: 0;
   left: 0;
   height: 50px; 
-  background: #f0f3fa; 
+  background: #ccc; 
+  border-bottom: 1px solid #888;
   width: 100%; 
   z-index: 10;
-  border-bottom: 1px solid;
+}
+
+#footer, .left, .middle, .right {
+  background: #fff;
+}
+
+#problems, #scoreboard_table_div, #answers, #footer {
+  border-top: 1px solid #888;
+}
+
+table {
+  border-collapse:collapse;
+}
+
+table, th, td {
+  border: 1px solid #aaa;
+}
+
+th {
+  border-bottom: 3px solid #ccc;
+  background: #eee;
+}
+
+#problems a:hover {
+  color: #0082d4;
+}
+
+#problems a {
+  color: #0058bb;
+  font-weight: bold;
+  margin: 0px;
+  padding: 2px 5px;
+  text-decoration: none;
+}
+
+.zip_line {
+  margin: 4px auto;
+  width: 30%;
+  background: #ccc;
+  height: 1px;
 }
 
 #footer {
   position: absolute; 
-  background: #f0f3fa; 
   height: 32px; 
   bottom: 0; left: 0; right: 0;
-  border-top: solid 1px;
   z-index: 15;
 }
 
@@ -46,48 +89,33 @@ html, body {
 }
 .left {
   width: 225px; 
-  background: #f0f3fa; 
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
-  margin: 50px 0px 33px 0px;
-  border-right: 2px solid #600;
+  margin: 50px 0px 0px 0px;
+  border-right: 1px solid #888;
   z-index: 5;
 }
 .middle {
-  background: #f0f3fa; 
   position: absolute;
   width: auto;
-  min-width: 400px;
+  min-width: 295px;
   top: 0; left: 0; bottom: 0; right: 0;
-  margin: 50px 230px 33px 225px;
+  margin: 50px 230px 0px 225px;
 }
 .right {
   width: 230px; 
-  background: #f0f3fa; 
   position: absolute;
   top: 0; right: 0; bottom: 0; right: 0;
-  margin: 50px 0px 33px 0px;
-  border-left: 2px solid #600; 
-}
-
-#header #title h1 {
-  margin: 0;
-  height: 42px;
-  text-align: center;
-  padding: 5px;
-  font-variant: small-caps;
-  color: #55a;
-  text-shadow: #333 1px 1px 2px;
+  margin: 50px 0px 0px 0px;
+  border-left: 1px solid #888;
 }
 
 #header #timer {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  font-family: monospace;
-  background: #FEE;
-  padding: 0.25em;
-  font-size: 150%;
+  color: #208120;
+  font-weight: bold;
+  padding: 10px 0px;
+  font-size: 24px;
+  text-align: center;
   -moz-border-radius: 0 0 0 0.5em;
   -webkit-border-radius: 0 0 0 0.5em;
 }
@@ -96,12 +124,14 @@ html, body {
   position: absolute;
   left: 0px;
   top: 0px;
-  padding: 4px;
+  margin: 6px 10px 4px 10px;
+  width: 141px;
+  height: 40px;
+  background: url('/images/proco_logo40.png');
 }
 
 #footer #quote_marquee {
   height: 18px;
-  background: #f0f3fa;
   color: #C00;
   text-align: right;
   padding: 0.25em;
@@ -109,16 +139,40 @@ html, body {
 }
 
 .div_title {
+  border-bottom: 1px solid #bbb;
   color: #000;
-  padding: 0.3em; 
 	margin-bottom: 5px;
 	text-align: center;
-	font-size: 125%;
+	font-size: 14px;
   font-weight: bold;
-  font-variant: small-caps;
-  background: #BCE;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
+}
+
+#messages div div {
+  padding: 3px 7px;
+  margin: 2px 0px;
+}
+
+#messages .broadcast {
+  background: #ffc2d3;
+  border-bottom: 1px solid #ff6c95;
+}
+
+#messages .reply {
+  background: #ddd8ff;
+  border-bottom: 1px solid #a195ff;
+}
+
+#messages .asked {
+  background: #eee;
+  border-bottom: 1px solid #bbb;
+}
+
+h5 {
+  color: #555;
+  font-size: 10px;
+  padding: 0px;
+  margin: 0px 0px 2px 0px;
+  text-align: center;
 }
 
 #submissions_upload {
@@ -126,10 +180,6 @@ html, body {
   text-align: center;
   overflow: visible;
   border-bottom: solid 1px;
-}
-
-#submissions_upload .form {
-  overflow: hidden;
 }
 
 #submissions_upload_status {
@@ -142,9 +192,8 @@ html, body {
 }
 
 #submissions_table_div {
-  background: #f0f3fa; 
   height: 50%;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #submissions_table {
@@ -158,102 +207,32 @@ html, body {
 }
 
 #scoreboard_table_div  {
-  background: #f0f3fa; 
   height: 50%;
-  overflow-y: scroll;
-  border-top: solid 2px;
-}
-
-#games_table_div {
-  background: #f0f3fa; 
-  height: 40%;
-  overflow-y: scroll;
-}
-
-#games_table {
-  margin: auto;
-  width: 100%;
-}
-
-#games_visualizer_div {
-  background: #FCF8F8; 
-  height: 60%;
-  overflow-y: scroll;
-  border-top: solid 2px;
-}
-
-#games_visualizer_ajax {
-  text-align: center;
+  overflow-y: auto;
 }
 
 #ask {
-  height: 40%;
-  overflow-y: scroll;
+  height: 30%;
+  overflow-y: auto;
+}
+
+#ask #ask_message {
+  background: #eee; 
+  border: 1px solid #bbb;
+  padding: 3px;
 }
 
 #answers {
-  border-top: solid 1px;
-  height: 60%;
-  overflow-y: scroll;
-}
-
-#clarification_ajax {
-  font-size: 80%;
-}
-
-#ask_area {
-	background: #FFFFFF;
+  height: 70%;
+  overflow-y: auto;
 }
 
 #problems {
-}
-
-#problems_info {
-	font-size: 80%;
   text-align: center;
-	margin: 0 0 0.5em 0;
-}
-
-#problems ul {
-}
-
-.listmenu {
-	margin: 0em;
-}
-
-.listmenu ul {
-  margin: 0 0 5px 0;
-  padding: 0 0 2px 0;
-  list-style-type: none;
-  font-size: 70%;
-}
-
-.listmenu li a {
-  color: #600;
-  display: block;
-  height: 25px;
-  padding: 0.2em;
-  text-decoration: none;
-  font-weight:bold;
-  border-bottom: solid 1px;
-  text-align: center;
-}
-
-.listmenu li a:hover {
-  background: #CAA;
-  color: #FFF;
 }
 
 .results_table td {
   text-align: center;
-}
-
-.table_head {
-  background: #f8f8dd;
-}
-
-.table_blank {
-  background: #FFFFFF;
 }
 
 tr.correct {

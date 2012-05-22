@@ -1,0 +1,50 @@
+#logo_div {
+  padding: 100px 30px;
+  text-align: center;
+}
+
+#logo_div img {
+  width: 500px;
+}
+
+body {
+  background: #e3dcd1;
+  font-family: arial, sans-serif;
+}
+
+input:focus {
+  background: #eef3f8;
+  border: 1px solid #9eb3c8;
+}
+
+input, button {
+  border-radius: 10px;
+  padding: 2px 10px;
+  margin: 3px 0px;
+}
+
+input {
+  background: #d4e0ec;
+  border: 1px solid #8da3ba;
+  font-size: 24px;
+  width: 300px;
+  height: 36px;
+}
+
+button:focus {
+  background: #e1e8ef;
+  border: 1px solid #9eb3c8;
+}
+
+button {
+  background: #76b737;
+  border: 1px solid #4c9603;
+  font-weight: bold;
+  width: 322px;
+  height: 42px;
+  text-transform: uppercase;
+}
+
+h1 {
+  
+}

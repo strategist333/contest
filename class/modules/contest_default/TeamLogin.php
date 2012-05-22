@@ -37,7 +37,8 @@ class TeamLogin {
 <html>
 <head>
 <title>Log In</title>
-<link href="main.css" rel="stylesheet" type="text/css">
+<link href="/css/reset.css" rel="stylesheet" type="text/css">
+<link href="/css/login.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
 
 <?php
@@ -46,7 +47,7 @@ class TeamLogin {
 <script type="text/javascript">
 (function ($) {
   $(document).ready( function() {
-    $("#username-input").focus();
+    $("#username_input").focus();
   });
 })(window.jQuery);
 </script>
@@ -58,29 +59,26 @@ class TeamLogin {
 
 <body>
 
-<div id="logo-div">
-  <img src="images/proco_logo64.png">
+<div id="logo_div">
+  <img src="images/proco_vector.png" alt="ProCo">
 </div>
 
 <div align="center">
 <h1>Team Log In</h1>
 </div>
 
-<hr>
 <div align="center">
 <?php
   print implode("\n", $bodyHTML);
   if (!isset($_SESSION['login'])) {
 ?>
-<span class="div-title">Warning: Team name is <b>case-sensitive</b>!!!</span>
+<span class="div_title">Warning: Team name is <b>case-sensitive</b>!!!</span>
 <br/>
 <br/>
 <form name="login" method="post" action="login.php">
-<table border="0" width="400">
-<tr><td style="text-align: right;">Team:</td><td><input id="username-input" type="text" name="username" /></td></tr>
-<tr><td style="text-align: right;">Password:</td><td><input type="password" name="password" /></td></tr>
-<tr align="center"><td colspan="2"><input type="submit" value="Log Me In!" /></td></tr>
-</table>
+<div id="input_div"><input id="username_input" type="text" name="username" /></div>
+<div id="input_div"><input type="password" name="password" /></div>
+<div id="input_div"><button>Log in!</button></div>
 </form>
 <?php
   }

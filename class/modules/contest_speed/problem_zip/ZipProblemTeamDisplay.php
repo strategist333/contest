@@ -7,7 +7,7 @@ class ZipProblemTeamDisplay extends ProblemTeamDisplay {
     $linkID = parent::transformID('link');
 // BEGIN RENDER
 ?>
-<a id="<?= $linkID ?>" href="<?= $this->url ?>">Download archive</a><br />
+<a id="<?= $linkID ?>" href="<?= $this->url ?>">Download archive</a><div class="zip_line"></div>
 <?php
 // END RENDER
   }

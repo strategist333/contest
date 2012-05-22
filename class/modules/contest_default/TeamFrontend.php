@@ -13,11 +13,6 @@ class TeamFrontend {
 <title><?= ($g_curr_contest ? ($g_curr_contest['contest_name'] . ' ') : '')?>Contest Portal</title>
 <link rel="shortcut icon" href="favicon.ico" />
 <link href="/css/main.css" rel="stylesheet" type="text/css">
-<!--[if IE]>
-<link href="/css/ie.css" rel="stylesheet" type="text/css">
-<![endif]--> 
-
-<link href="/css/main.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="/js/si.files.js"></script>
 <?php
@@ -30,7 +25,7 @@ class TeamFrontend {
 <?php
     $this->renderHeader();
     $this->renderBody();
-    $this->renderFooter();
+    //$this->renderFooter();
 ?>
 </div>
 </body>
@@ -219,18 +214,23 @@ class TeamFrontend {
           $.each(ret['clarifications'], function(index, message) {
             var date = getCanonicalTime(new Date(message['time_posted'] * 1000).toTimeString());
             var messageType = "";
+            var messageClass = "";
             switch (message['type']) {
               case <?= $k_post_broadcast; ?>:
                 messageType = "Broadcast message";
+                messageClass = "broadcast";
                 break;
               case <?= $k_post_reply; ?>:
                 messageType = "Reply";
+                messageClass = "reply";
                 break;
               default:
                 messageType = "Asked";
+                messageClass = "asked";
                 break;
             }
-            container.append($("<div>").append($("<h5>").text(messageType + " at " + date))
+            container.append($("<div>").addClass(messageClass)
+                                       .append($("<h5>").text(messageType + " at " + date))
                                        .append($("<span>").text(message['text'])));
           });
           $("#messages").empty().append(container);
@@ -303,11 +303,8 @@ class TeamFrontend {
 // BEGIN RENDER HEADER
 ?>
 <div id="header">
-  <div id="timer"></div>
   <div id="logo_div"></div>
-  <div id="title">
-    <h1>Team Control Panel</h1>
-  </div>
+  <div id="timer"></div>
 </div>
 <?php
 // END RENDER HEADER
@@ -319,7 +316,7 @@ class TeamFrontend {
 <div id="footer">
 <span>
   <div id="quote_marquee">
-    &#8220;Beware of bugs in the above code; I have only proved it correct, not tried it.&#8221; &mdash; Donald Knuth
+    hi frank li!
   </div>
 </span>
 </div>
@@ -359,7 +356,7 @@ class TeamFrontend {
 ?>
 <div id="upload">
   <div class="div_padding">
-    <div class="div_title">Submit a<br />Solution File:</div>
+    <div class="div_title">Submit Solution</div>
     <button id="submissions_upload" style="height: 30px; ">Upload</button>
     <div id="submissions_upload_status">Select a file</div>
   </div>
@@ -431,7 +428,7 @@ class TeamFrontend {
 ?>
 <div id="ask">   
   <div class="div_padding">
-    <div class="div_title">Clarification Requests</div>
+    <div class="div_title">Request Clarification</div>
     <form>
       <center>
         <textarea id="ask_message" style="width: 90%; margin: auto;" rows="5"></textarea>
