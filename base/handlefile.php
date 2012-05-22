@@ -8,11 +8,11 @@ if (!isset($_SESSION['login']) || !$g_curr_contest || $_SESSION['login']['contes
 }
 
 if (isset($_REQUEST['action'])) {
-  $action = $_REQUEST['action'];  
-  
+  $action = $_REQUEST['action'];
+
   try {
     $handler = load(currentContestType(), 'TeamLoadHandler');
-    if (method_exists($handler, $action)) { 
+    if (method_exists($handler, $action)) {
       call_user_func(array($handler, $action));
     }
   } catch (Exception $e) {

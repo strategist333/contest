@@ -79,7 +79,10 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
           os.killpg(grader_executer.pid, signal.SIGKILL)
         if team_executer.poll() is None:
           os.killpg(team_executer.pid, signal.SIGKILL)
-          raise GradingException('Time limit exceeded')
+          if not grader_finished:
+            raise GradingException('Time limit exceeded')
+          else:
+            raise GradingException('Incorrect output')
         if team_executer.returncode != 0:
           raise GradingException('Run time error')
         if not grader_finished:
