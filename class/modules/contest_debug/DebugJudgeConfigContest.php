@@ -33,7 +33,7 @@ class DebugJudgeConfigContest extends JudgeConfigContest {
       <td>Scoreboard Freeze when</td>
       <td>
         <input type="text" id="freeze_hour" size="2" value="1" /> hours&nbsp;
-        <input type="text" id="freeze_minute" size="2" value="30" /> minutes remain
+        <input type="text" id="freeze_minute" size="2" value="30" /> minutes into contest
       </td>
     </tr>
 <?php
