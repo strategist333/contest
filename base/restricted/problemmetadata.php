@@ -12,7 +12,8 @@ if (isset($_POST['data'])) {
     if (!$division_metadata) {
       $division_metadata = array();
     }
-    loadWithPrefix(currentContestType(), $json['problem_type'], 'ProblemConfigMetadata', $json['problem_id'], $json['division_id'], $json['contest_id'], $metadata, $division_metadata)->render();
+    $contest = DBManager::getContest($json['contest_id']);
+    loadWithPrefix($contest['contest_type'], $json['problem_type'], 'ProblemConfigMetadata', $json['problem_id'], $json['division_id'], $json['contest_id'], $metadata, $division_metadata)->render();
   }
 }
 ?>

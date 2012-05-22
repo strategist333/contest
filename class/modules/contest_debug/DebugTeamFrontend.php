@@ -11,6 +11,7 @@ class DebugTeamFrontend extends TeamFrontend {
      <div class="div_title">Submit Solution</div>
      <div>
        Problem:
+<?php if(isset($_SESSION['login'])) { ?>
        <select id="problem_id">
 <?php
 $contest_id = $_SESSION['login']['contest_id'];
@@ -22,6 +23,7 @@ foreach($problems as $problem) {
         <option value="<?=$problem['alias']?>"><?=$problem['alias']?> <?=$problem['title']?></option>
 <?php
 }
+} // isset($_SESSION['login'])
 ?>
        </select>
      </div>
