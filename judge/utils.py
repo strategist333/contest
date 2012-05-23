@@ -10,8 +10,16 @@ from string import Template
 
 import config
 
+def init():
+  pwd_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+  pwd_manager.add_password(None, config.handle_url, config.username, config.password)
+  authhandler = urllib2.HTTPBasicAuthHandler(pwd_manager)
+  opener = urllib2.build_opener(authhandler)
+  urllib2.install_opener(opener)
+
 def call(**kwargs):
   '''Helper function to POST a json call to config.handle_url.'''
+  
   req = urllib2.urlopen(config.handle_url, json.dumps(kwargs, separators=(',',':')))
   if not req:
     raise Exception('Failed to open connection.')

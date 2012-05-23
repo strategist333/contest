@@ -58,6 +58,7 @@ def _import_module(contest_type, problem_type):
   raise Exception('No module found for %s.%s' % (contest_type, problem_type))
 
 if __name__ == '__main__':
+  utils.init()
   judge = Judge()
   print time.strftime('[%H:%M:%S]:', time.localtime()),
   print 'Initialized judge to %s' % judge

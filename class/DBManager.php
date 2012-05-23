@@ -397,6 +397,9 @@ class DBManager {
       $problem_id = $run_info['problem_id'];
       $team_id = $run_info['team_id'];
       $problem_info = self::querySelectUnique('select problem_id, problem_type, contests_divisions_problems.alias as alias, problems.metadata as problem_metadata, division_id, division_metadata, team_id, username as team_username from teams join divisions using (division_id) join contests_divisions_problems using (division_id) join problems using (problem_id) where team_id = ? and contest_id = ? and problem_id = ?', $team_id, $contest_id, $problem_id);
+      if (!$problem_info) {
+        throw new Exception('Problem not fetched.');
+      }
       $res = array_merge($run_info, $problem_info);
       self::commit();
     }
