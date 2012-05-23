@@ -290,7 +290,23 @@ class DBManager {
   }
   
   public static function modifyProblem($problem_id, $key, $value) {
-    return self::queryUpdate('update problems set ' . $key . ' = ? where problem_id = ?', $value, $problem_id);
+    $success = false;
+    try {
+      self::begin();
+      if (self::queryUpdate('update problems set ' . $key . ' = ? where problem_id = ?', $value, $problem_id) != 1) {
+        throw new Exception('Did not update problem.');
+      }
+      if ($key == 'problem_type') {
+        $division_metadata = '{}';
+        self::queryUpdate('update contests_divisions_problems set division_metadata = ? where problem_id = ?', $division_metadata, $problem_id);
+      }
+      self::commit();
+      $success = true;
+    }
+    catch (Exception $e) {
+      self::rollback();
+    }
+    return $success;
   }
   
   public static function modifyContestDivisionProblem($problem_id, $division_id, $contest_id, $key, $value) {
@@ -302,7 +318,8 @@ class DBManager {
   }
   
   public static function addContestDivisionProblem($problem_id, $division_id, $contest_id) {
-    return self::queryUpdate('insert ignore into contests_divisions_problems set problem_id = ?, division_id = ?, contest_id = ?, division_metadata = ?', $problem_id, $division_id, $contest_id, '{}');
+    $division_metadata = '{}';
+    return self::queryUpdate('insert ignore into contests_divisions_problems set problem_id = ?, division_id = ?, contest_id = ?, division_metadata = ?', $problem_id, $division_id, $contest_id, $division_metadata);
   }
   
   public static function removeContestDivisionProblem($problem_id, $division_id, $contest_id) {
@@ -313,7 +330,8 @@ class DBManager {
     global $k_problem_active;
     try {
       self::begin();
-      $res = self::queryInsert('insert into problems set status = ?, metadata = ?, order_seq = (select next_order_seq from globals)', $k_problem_active, '{}');
+      $metadata = '{}';
+      $res = self::queryInsert('insert into problems set status = ?, metadata = ?, order_seq = (select next_order_seq from globals)', $k_problem_active, $metadata);
       self::queryUpdate('update globals set next_order_seq = next_order_seq + 1');
       self::commit();
     }
@@ -339,7 +357,8 @@ class DBManager {
       else {
         $problem_id = $problem['problem_id'];
         $run_id = self::queryInsert('insert into runs set problem_id = ?, team_id = ?, payload = ?, time_submitted = unix_timestamp(), metadata = ?, status = ?', $problem_id, $team_id, $payload, $metadata, $k_run_active);
-        $update_count = self::queryUpdate('insert into judgments set judge_id = ?, run_id = ?, time_updated = unix_timestamp(), metadata = ?, status = ?', $k_judge_none, $run_id, '{}', $k_judgment_none);
+        $default_metadata = '{}';
+        $update_count = self::queryUpdate('insert into judgments set judge_id = ?, run_id = ?, time_updated = unix_timestamp(), metadata = ?, status = ?', $k_judge_none, $run_id, $default_metadata, $k_judgment_none);
         if ($run_id == 0 || $update_count != 1) {
           throw new Exception('Run and judgment not inserted');
         }

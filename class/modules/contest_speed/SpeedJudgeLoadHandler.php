@@ -150,7 +150,6 @@ class SpeedJudgeLoadHandler extends JudgeLoadHandler {
   }
   
   public function upload_interactive_grader() {
-    
     if (isset($_FILES['upload_file']) && $_FILES['upload_file']['size'] > 0) {
       $tmpname = $_FILES['upload_file']['tmp_name'];
       if (isset($_REQUEST['contest_id']) && isset($_REQUEST['problem_id'])) {

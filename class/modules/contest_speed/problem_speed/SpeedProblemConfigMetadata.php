@@ -5,11 +5,14 @@ class SpeedProblemConfigMetadata extends ProblemConfigMetadata {
   
   public function __construct($problem_id, $division_id, $contest_id, $metadata, $division_metadata) {
     parent::__construct($problem_id, $division_id, $contest_id, $metadata, $division_metadata);
+    $this->needs_update = false;
     if (!isset($this->division_metadata['points'])) {
       $this->division_metadata['points'] = 0;
+      $this->needs_update = true;
     }
     if (!isset($this->metadata['judge_io'])) {
       $this->metadata['judge_io'] = array();
+      $this->needs_update = true;
     }
   }
   
@@ -40,6 +43,20 @@ class SpeedProblemConfigMetadata extends ProblemConfigMetadata {
       }
     });
   });
+
+<?php
+  if ($this->needs_update) {
+?>
+  $.ajax({
+    data: JSON.stringify({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : 'division_metadata', 'value' : JSON.stringify(divisionMetadata)})
+  });
+  $.ajax({
+    data: JSON.stringify({'action' : 'modify_problem', 'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'key' : 'metadata', 'value' : JSON.stringify(metadata)})
+  });
+<?php
+  }
+?>
+  
   $("#<?= $downloadID ?>").click(function() {
     window.location.href = "handlefile.php?action=download_speed_zip&problem_id=" + problemID + "&division_id=" + divisionID + "&contest_id=" + contestID;
   });
