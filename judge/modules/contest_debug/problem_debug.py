@@ -1,102 +1,82 @@
-import modules.contest_debug.compile
-from modules.contest_debug.compile import GradingException
 import exceptions
 import os
+import shutil
 import signal
 from string import Template
 import subprocess
-import tempfile
 import time
-import traceback
-import sys
+import tempfile
+
 import utils
-import pipes
 
-languages = {
-  'c'    : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=2),
-  'cc'   : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=2),
-  'cpp'  : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=2),
-  'java' : dict(executer=Template('java $src_filebase'),
-                executer_time_limit=3),
-  'py'   : dict(executer=Template('python $src_filebase.pyc'),
-                executer_time_limit=4)
-}
-
-def run_tests(task, team_select, team_correct, team_wrong, metadata):
-  '''Compile judge cleanly and execute the test case on the judge. '''
-  result = False
-
+def run_test(grader_executer_cmd, team_input, desired_return_code):
+  '''Run an individual test and return whether it was accepted by the grader.'''
   time_limit = 5
-  try:
-    payload = task['problem_metadata']['grader']['src']
-    grader_filebase = task['problem_metadata']['grader']['filebase']
-    grader_extension = task['problem_metadata']['grader']['extension']
-    grader_filename = grader_filebase + '.' + grader_extension
-    modules.contest_debug.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
 
-    correct_status = False   # Was the supposedly correct input actually correct?
-    wrong_status = False     # Was the supposedly wrong input actually wrong?
-
-    grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
-
-    # Run grader on team-submitted "correct" data
-    utils.progress("Running on good input")
-
-    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)    
-    start_time = time.time()
-    grader_executer.communicate(team_correct)
-    while grader_executer.poll() is None and time.time() - start_time < time_limit:
-      time.sleep(0.5)
-    grader_finished = grader_executer.poll() is not None
-    if not grader_finished:
-      os.killpg(grader_executer.pid, signal.SIGKILL)
-    elif grader_executer.returncode == 100:
-      correct_status = True
-
-    # Run grader on team-submitted "wrong" data
-    utils.progress("Running on bad input")
-
-    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)
-    start_time = time.time()
-    grader_executer.communicate(team_wrong)
-    while grader_executer.poll() is None and time.time() - start_time < time_limit:
-      time.sleep(0.5) 
-    grader_finished = grader_executer.poll() is not None
-    if not grader_finished:
-      os.killpg(grader_executer.pid, signal.SIGKILL)
-    elif grader_executer.returncode == 200:
-      wrong_status = True
-
-    # correct
-    if task['division_metadata']['type'] == 'correct':
-      if correct_status:
-        result = True
-
-    # wrong  
-    if task['division_metadata']['type'] == 'wrong':
-      if wrong_status:
-        result = True
-
-    # sometimes  
-    if task['division_metadata']['type'] == 'sometimes':
-      if correct_status and wrong_status:
-        result = True
-
-  except Exception, e:
-    utils.progress('Internal error when compiling grader.')
-    raise Exception(e)
-
-  if result:
-    utils.progress('Correct')
+  stdin = tempfile.TemporaryFile(bufsize=10485760)
+  stdin.write(team_input)
+  stdin.flush()
+  stdin.seek(0)
+  
+  grader_executer = subprocess.Popen(grader_executer_cmd, stdin=stdin, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)    
+  start_time = time.time()
+  while grader_executer.poll() is None and time.time() - start_time < time_limit:
+    time.sleep(0.5)
+  grader_finished = grader_executer.poll() is not None
+  if grader_executer.poll() is None:
+    os.killpg(grader_executer.pid, signal.SIGKILL)
+    return False
   else:
-    utils.progress('Incorrect')
+    return (grader_executer.returncode == desired_return_code)
 
-  return result
+def run_tests(task, team_select, team_correct, team_wrong):
+  '''Compile judge and run both test cases on the judge. '''
+  
+  payload = task['problem_metadata']['grader']['src']
+  grader_filebase = task['problem_metadata']['grader']['filebase']
+  grader_extension = task['problem_metadata']['grader']['extension']
+  grader_filename = grader_filebase + '.' + grader_extension
+  utils.compile(payload, grader_filebase, grader_extension, grader_filename)
+  grader_executer_cmd = utils.languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
+  
+  actual_type = task['division_metadata']['type']
 
+  if actual_type == 'correct' or actual_type == 'sometimes':
+    utils.progress('Testing team good input')
+    if not run_test(grader_executer_cmd, team_correct, 100):
+      return False
+
+  if actual_type == 'wrong' or actual_type == 'sometimes':
+    utils.progress('Testing team bad input')
+    if not run_test(grader_executer_cmd, team_wrong, 200):
+      return False
+  
+  return True
 
 def grade(q, task, **kwargs):
-  # Grades a debugging submission
-  return modules.contest_debug.compile.grade(q, task, run_tests, **kwargs)
+  '''Grades a debug submission.'''
+  
+  correct = False
+  metadata = {}
+  
+  try:
+    team_select = task['run_metadata']['type']
+    team_correct = task['run_metadata']['good']
+    team_wrong = task['run_metadata']['bad']
+    
+    if task['division_metadata']['type'] == team_select:
+      try:
+        sandbox_dir = tempfile.mkdtemp(prefix='proco')
+        os.chdir(sandbox_dir)
+        correct = run_tests(task, team_select, team_correct, team_wrong)
+        if correct:
+          utils.progress('Correct')
+        else:
+          utils.progress('Wrong')
+      finally:
+        shutil.rmtree(sandbox_dir)
+    else:
+      utils.progress('Wrong (solution type mismatch)')
+  except Exception, e:
+    utils.progress('Internal error: ' + str(e))
+  q.put({'correct' : correct, 'metadata' : metadata, 'division_id' : int(task['division_id']), 'team_id' : int(task['team_id']), 'problem_id' : int(task['problem_id'])})
