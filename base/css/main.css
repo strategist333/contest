@@ -15,9 +15,10 @@ html, body {
   background: #fff;
 }
 
-html, body, textarea {
+html, body, #ask_message {
   font-family: Arial, sans-serif;
   font-size: 12px;
+  line-height: 1.1;
 }
 
 #container {
@@ -41,7 +42,7 @@ html, body, textarea {
   background: #fff;
 }
 
-#problems, #scoreboard_table_div, #answers, #footer {
+#problems .div_padding, #scoreboard_table_div .div_padding, #answers .div_padding {
   border-top: 1px solid #888;
 }
 
@@ -56,6 +57,11 @@ table, th, td {
 th {
   border-bottom: 3px solid #ccc;
   background: #eee;
+  font-weight: bold;
+}
+
+th, td {
+  padding: 3px;
 }
 
 #problems a:hover {
@@ -65,8 +71,7 @@ th {
 #problems a {
   color: #0058bb;
   font-weight: bold;
-  margin: 0px;
-  padding: 2px 5px;
+  line-height: 1.3;
   text-decoration: none;
 }
 
@@ -88,7 +93,7 @@ th {
   padding: 0.5em;
 }
 .left {
-  width: 225px; 
+  width: 180px; 
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
   margin: 50px 0px 0px 0px;
@@ -98,16 +103,20 @@ th {
 .middle {
   position: absolute;
   width: auto;
-  min-width: 295px;
+  min-width: 390px;
   top: 0; left: 0; bottom: 0; right: 0;
-  margin: 50px 230px 0px 225px;
+  margin: 50px 180px 0px 180px;
 }
 .right {
-  width: 230px; 
+  width: 180px; 
   position: absolute;
   top: 0; right: 0; bottom: 0; right: 0;
   margin: 50px 0px 0px 0px;
   border-left: 1px solid #888;
+}
+
+#header #timer.expired {
+  color: #cc3333;
 }
 
 #header #timer {
@@ -145,11 +154,12 @@ th {
 	text-align: center;
 	font-size: 14px;
   font-weight: bold;
+  padding: 0px 0px 2px 0px;
 }
 
 #messages div div {
-  padding: 3px 7px;
-  margin: 2px 0px;
+  padding: 4px 6px 6px 6px;
+  margin: 0px;
 }
 
 #messages .broadcast {
@@ -168,27 +178,53 @@ th {
 }
 
 h5 {
-  color: #555;
+  color: #666;
   font-size: 10px;
   padding: 0px;
-  margin: 0px 0px 2px 0px;
+  margin: 0px 0px 4px 0px;
+  text-align: center;
+}
+
+#submissions_upload:active,
+#ask_submit:active,
+#debug_submit:active {
+  text-align: center;
+  border: 1px solid #999;
+  background: #ddd;
+  padding: 3px 5px;
+  border-radius: 7px;
+}
+
+#submissions_upload,
+#ask_submit,
+#debug_submit {
+  text-align: center;
+  border: 1px solid #777;
+  background: #ccc;
+  padding: 3px 5px;
+  border-radius: 7px;
+  margin: 0px;
+}
+
+#upload {
   text-align: center;
 }
 
 #submissions_upload {
-  height: 10em;
-  text-align: center;
   overflow: visible;
-  border-bottom: solid 1px;
 }
 
-#submissions_upload_status {
-  border: solid 1px;
-  background: #EEF;
+#submissions_upload_button {
+  margin: 3px;
+}
+
+#submissions_upload_status,
+#submissions_status {
+  background: #ddd8ff;
   text-align: center;
-  margin-top: 0.5em;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
+  padding: 5px;
+  margin: 0px 0px 7px 0px;
+  color: #555;
 }
 
 #submissions_table_div {
@@ -206,6 +242,10 @@ h5 {
   width: 100%;
 }
 
+#scoreboard_table tr.me td {
+  font-weight: bold;
+}
+
 #scoreboard_table_div  {
   height: 50%;
   overflow-y: auto;
@@ -216,10 +256,38 @@ h5 {
   overflow-y: auto;
 }
 
-#ask #ask_message {
-  background: #eee; 
+#ask #ask_message,
+#soln_good,
+#soln_bad {
+  width: 95%;
+}
+
+#ask #ask_message,
+#soln_good,
+#soln_bad,
+#problem_id,
+#soln_type {
+  background: #f8f8f8; 
   border: 1px solid #bbb;
   padding: 3px;
+  margin-bottom: 7px;
+}
+
+#soln_good:disabled,
+#soln_bad:disabled {
+  background: #ddd;
+}
+
+#problem_id,
+#soln_type {
+  padding: 1px;
+}
+
+#problem_id_label,
+#soln_type_label,
+#soln_good_label,
+#soln_bad_label {
+  margin-bottom: 2px;
 }
 
 #answers {

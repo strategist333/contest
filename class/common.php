@@ -52,7 +52,7 @@ function loadWithPrefix($curr_contest_type, $prefix, $base_class_name) {
 function footer() {
   print <<<HEREDOC
 <p><small>
-Copyright (c) 2010-12 Frank Li<br>
+Copyright (c) 2010-12 Frank Li, Frank Chen, Wendy Mu<br>
 </small></p>
 HEREDOC;
 }

@@ -23,14 +23,14 @@ class TeamLogin {
       header('Location: index.php');
     }
     else {
-      array_push($bodyHTML, '<font color="red"><p>Invalid username or password!</p></font>');
+      array_push($bodyHTML, '<div class="login_error">Invalid username or password!</div>');
     }
   }
   // Otherwise log the team out
   else if (isset($_SESSION['login']))
   {
     unset($_SESSION['login']);
-    array_push($bodyHTML, '<p><b><big>Now logged out.</big></b></p>');
+    array_push($bodyHTML, '<div class="login_message">Now logged out.</div>');
   }
 ?>
 <!doctype html>
@@ -46,8 +46,23 @@ class TeamLogin {
 ?>
 <script type="text/javascript">
 (function ($) {
+  function makeDynamicText(elem, text) {
+    elem.focus(function() {
+      $(this).removeClass("defaultInput");
+      $(this).val("");
+    });
+    elem.blur(function() {
+      if (!$(this).val()) {
+        $(this).addClass("defaultInput");
+        $(this).val(text);
+      }
+    });
+    elem.blur();
+  }
+
   $(document).ready( function() {
-    $("#username_input").focus();
+    makeDynamicText($("#username_input"), "username");
+    makeDynamicText($("#password_input"), "password");
   });
 })(window.jQuery);
 </script>
@@ -60,7 +75,7 @@ class TeamLogin {
 <body>
 
 <div id="logo_div">
-  <img src="images/proco_vector.png" alt="ProCo">
+  <img src="images/proco_logo300.png" alt="ProCo">
 </div>
 
 <div align="center">
@@ -72,20 +87,20 @@ class TeamLogin {
   print implode("\n", $bodyHTML);
   if (!isset($_SESSION['login'])) {
 ?>
-<span class="div_title">Warning: Team name is <b>case-sensitive</b>!!!</span>
-<br/>
-<br/>
+<div class="div_title">Warning: Team name is <b>case-sensitive</b>!!!</div>
 <form name="login" method="post" action="login.php">
 <div id="input_div"><input id="username_input" type="text" name="username" /></div>
-<div id="input_div"><input type="password" name="password" /></div>
-<div id="input_div"><button>Log in!</button></div>
+<div id="input_div"><input id="password_input" type="password" name="password" /></div>
+<div id="input_div"><input type="submit" id="submit" value="Log in!"></input></div>
 </form>
 <?php
   }
 ?>
 
 </div>
+<div id="footer">
 <?php footer(); ?>
+</div>
 </body>
 </html>
 
