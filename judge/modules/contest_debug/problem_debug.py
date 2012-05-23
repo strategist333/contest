@@ -26,7 +26,7 @@ languages = {
 }
 
 def run_tests(task, team_select, team_correct, team_wrong, metadata):
-  # Compiles the judge cleanly and executes the test case on the judge
+  '''Compile judge cleanly and execute the test case on the judge. '''
   result = False
 
   time_limit = 5
@@ -37,19 +37,15 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_filename = grader_filebase + '.' + grader_extension
     modules.contest_debug.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
 
-    def grader_init():
-      os.setsid()
-      os.execvp(grader_executer_cmd[0], grader_executer_cmd)
-
-    correctStatus = False   # Was the supposedly correct input actually correct?
-    wrongStatus = False     # Was the supposedly wrong input actually wrong?
+    correct_status = False   # Was the supposedly correct input actually correct?
+    wrong_status = False     # Was the supposedly wrong input actually wrong?
 
     grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
 
-    # run grader on correct data
+    # Run grader on team-submitted "correct" data
     utils.progress("Running on good input")
 
-    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)    
+    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)    
     start_time = time.time()
     grader_executer.communicate(team_correct)
     while grader_executer.poll() is None and time.time() - start_time < time_limit:
@@ -57,13 +53,13 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_finished = grader_executer.poll() is not None
     if not grader_finished:
       os.killpg(grader_executer.pid, signal.SIGKILL)
-    if grader_executer.returncode == 100:
-      correctStatus = True
+    elif grader_executer.returncode == 100:
+      correct_status = True
 
-    # run grader on wrong data
+    # Run grader on team-submitted "wrong" data
     utils.progress("Running on bad input")
 
-    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)
+    grader_executer = subprocess.Popen(grader_executer_cmd, stdin=subprocess.PIPE, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)
     start_time = time.time()
     grader_executer.communicate(team_wrong)
     while grader_executer.poll() is None and time.time() - start_time < time_limit:
@@ -71,32 +67,32 @@ def run_tests(task, team_select, team_correct, team_wrong, metadata):
     grader_finished = grader_executer.poll() is not None
     if not grader_finished:
       os.killpg(grader_executer.pid, signal.SIGKILL)
-    if grader_executer.returncode == 200:
-      wrongStatus = True
+    elif grader_executer.returncode == 200:
+      wrong_status = True
 
     # correct
-    if(task['division_metadata']['type'] == "correct"):
-      if(correctStatus == True):
+    if task['division_metadata']['type'] == 'correct':
+      if correct_status:
         result = True
 
     # wrong  
-    if(task['division_metadata']['type'] == "wrong"):
-      if(wrongStatus == True):
+    if task['division_metadata']['type'] == 'wrong':
+      if wrong_status:
         result = True
 
     # sometimes  
-    if(task['division_metadata']['type'] == "sometimes"):
-      if(correctStatus == True and wrongStatus == True):
+    if task['division_metadata']['type'] == 'sometimes':
+      if correct_status and wrong_status:
         result = True
 
   except Exception, e:
     utils.progress('Internal error when compiling grader.')
     raise Exception(e)
 
-  if(result == True):
-    utils.progress("Correct")
+  if result:
+    utils.progress('Correct')
   else:
-    utils.progress("Incorrect")
+    utils.progress('Incorrect')
 
   return result
 

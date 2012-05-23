@@ -60,7 +60,7 @@ class SpeedScoreboardManager {
       $contest_metadata = json_decode($g_curr_contest['metadata'], true);
       $metadata = array('judge_scoreboard' => $scoreboard, 'problems' => $problems);
       $team_scoreboard = array();
-      if (!isset($contest_metadata['time_freeze']) || (time() < $g_curr_contest['time_start'] + $g_curr_contest['time_length'] - $contest_metadata['time_freeze'])) {
+      if (!isset($contest_metadata['time_freeze']) || ($g_curr_contest['time_start'] + $contest_metadata['time_freeze'] > time())) {
         foreach ($scoreboard as $team) {
           array_push($team_scoreboard, array('team_id' => $team['team_id'], 'alias' => $team['alias'], 'score' => $team['score'], 'judgments' => $team['judgments']));
         }

@@ -1,7 +1,6 @@
-import modules.contest_speed.compile
-from modules.contest_speed.compile import GradingException
 import exceptions
 import os
+import shutil
 import signal
 from string import Template
 import subprocess
@@ -9,28 +8,17 @@ import time
 import tempfile
 
 import utils
-
-languages = {
-  'c'    : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=1),
-  'cc'   : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=1),
-  'cpp'  : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=1),
-  'java' : dict(executer=Template('java $src_filebase'),
-                executer_time_limit=2),
-  'py'   : dict(executer=Template('python $src_filebase.pyc'),
-                executer_time_limit=3)
-}
+from utils import GradingException
+import common
 
 def run_tests(task, team_filebase, team_extension, team_filename, metadata):
   '''Execute judge test cases.'''
 
-  time_limit = languages[team_extension]['executer_time_limit']
+  time_limit = utils.languages[team_extension]['executer_time_limit']
   num_test_cases = len(task['problem_metadata']['judge_io'])
 
   for index, test_case in enumerate(task['problem_metadata']['judge_io']):
-    executer_cmd = languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename).split()
+    executer_cmd = utils.languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename).split()
     
     stdin = tempfile.TemporaryFile(bufsize=10485760)
     stdin.write(test_case['input'])
@@ -43,7 +31,6 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
     start_time = time.time()
     while executer.poll() is None and (time.time() - start_time < time_limit):
       time.sleep(0.5)
-    
     if executer.poll() is None:
       os.killpg(executer.pid, signal.SIGKILL)
       raise GradingException('Time limit exceeded')
@@ -62,4 +49,4 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
 def grade(q, task, **kwargs):
   '''Grades a speed submission.'''
 
-  return modules.contest_speed.compile.grade(q, task, run_tests, **kwargs)
+  return common.setup(q, task, run_tests, **kwargs)

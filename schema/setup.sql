@@ -30,7 +30,7 @@ CREATE TABLE `contests` (
   `time_start` int(11) NOT NULL,
   `time_length` int(11) NOT NULL,
   `tag` varchar(32) NOT NULL,
-  `metadata` text NOT NULL,
+  `metadata` longtext NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`contest_id`),
   FOREIGN KEY (`tag`) REFERENCES `tags` (`tag`)
@@ -55,7 +55,7 @@ CREATE TABLE `problems` (
 CREATE TABLE `contests_divisions` (
   `contest_id` int(11) NOT NULL,
   `division_id` int(11) NOT NULL,
-  `metadata` text NOT NULL,
+  `metadata` longtext NOT NULL,
   FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
   FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Contests_Divisions';
@@ -66,7 +66,7 @@ CREATE TABLE `contests_divisions_problems` (
   `problem_id` int(11) NOT NULL,
   `url` varchar(250) NOT NULL DEFAULT '',
   `alias` varchar(128) NOT NULL DEFAULT '',
-  `division_metadata` text NOT NULL,
+  `division_metadata` longtext NOT NULL,
   PRIMARY KEY (`contest_id`, `division_id`, `problem_id`),
   FOREIGN KEY (`contest_id`) REFERENCES `contests` (`contest_id`),
   FOREIGN KEY (`division_id`) REFERENCES `divisions` (`division_id`),
@@ -92,7 +92,7 @@ CREATE TABLE `runs` (
   `team_id` int(11) NOT NULL,
   `payload` mediumblob NOT NULL,
   `time_submitted` int(11) NOT NULL,
-  `metadata` text NOT NULL,
+  `metadata` longtext NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`run_id`),
   FOREIGN KEY (`problem_id`) REFERENCES `problems` (`problem_id`),
@@ -104,7 +104,7 @@ CREATE TABLE `judgments` (
   `run_id` int(11) NOT NULL,
   `time_updated` int(11) NOT NULL,
   `judge_id` int(11) NOT NULL,
-  `metadata` text NOT NULL,
+  `metadata` longtext NOT NULL,
   `status` tinyint(3) NOT NULL,
   PRIMARY KEY (`judgment_id`),
   FOREIGN KEY (`run_id`) REFERENCES `runs` (`run_id`)

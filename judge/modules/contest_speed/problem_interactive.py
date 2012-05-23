@@ -1,5 +1,3 @@
-import modules.contest_speed.compile
-from modules.contest_speed.compile import GradingException
 import exceptions
 import os
 import signal
@@ -11,19 +9,8 @@ import traceback
 import sys
 
 import utils
-
-languages = {
-  'c'    : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=2),
-  'cc'   : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=2),
-  'cpp'  : dict(executer=Template('./$src_filebase'),
-                executer_time_limit=2),
-  'java' : dict(executer=Template('java $src_filebase'),
-                executer_time_limit=3),
-  'py'   : dict(executer=Template('python $src_filebase.pyc'),
-                executer_time_limit=4)
-}
+from utils import GradingException
+import common
 
 def run_tests(task, team_filebase, team_extension, team_filename, metadata):
   '''Compile interactive grader, and execute judge test cases.'''
@@ -33,12 +20,12 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
     grader_filebase =  task['problem_metadata']['grader']['filebase']
     grader_extension = task['problem_metadata']['grader']['extension']
     grader_filename = grader_filebase + '.' + grader_extension
-    modules.contest_speed.compile.compile(payload, grader_filebase, grader_extension, grader_filename)
+    utils.compile(payload, grader_filebase, grader_extension, grader_filename)
   except Exception, e:
     utils.progress('Internal error when compiling grader')
-    raise Exception(e)
+    raise e
   
-  time_limit = languages[team_extension]['executer_time_limit']
+  time_limit = utils.languages[team_extension]['executer_time_limit']
   num_test_cases = len(task['problem_metadata']['judge_io'])
 
   for index, test_case in enumerate(task['problem_metadata']['judge_io']):
@@ -64,8 +51,8 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
           os.dup2(grader_output_fd, 1)
           os.execvp(grader_executer_cmd[0], grader_executer_cmd)
         
-        team_executer_cmd = languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename).split()
-        grader_executer_cmd = languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
+        team_executer_cmd = utils.languages[team_extension]['executer'].substitute(src_filebase=team_filebase, src_filename=team_filename).split()
+        grader_executer_cmd = utils.languages[grader_extension]['executer'].substitute(src_filebase=grader_filebase, src_filename=grader_filename).split()
         grader_executer_cmd.append(input_filename)
         
         team_executer = subprocess.Popen(team_executer_cmd, stderr=open(os.devnull, 'w'), preexec_fn=team_init)
@@ -100,4 +87,4 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
 def grade(q, task, **kwargs):
   '''Grades an interactive submission.'''
 
-  return modules.contest_speed.compile.grade(q, task, run_tests, **kwargs)
+  return common.setup(q, task, run_tests, **kwargs)

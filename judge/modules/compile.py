@@ -1,19 +1,5 @@
-import exceptions
-import os
-import signal
-from string import Template
-import subprocess
-import sys
-import shutil
-import tempfile
-import time
-import traceback
-
 import utils
-
-class GradingException(exceptions.Exception):
-	def __init__(self, msg):
-		super(GradingException, self).__init__(msg)
+from utils import GradingException
 
 languages = {
   'c'    : dict(compiler=Template('gcc -o $src_filebase $src_filename'),
@@ -35,13 +21,14 @@ languages = {
 
 def compile(payload, src_filebase, src_extension, src_filename):
   '''Compile a payload in the current working directory.'''
-  
+
   with open(src_filename, 'w+') as src_file:
     src_file.write(payload)
     src_file.flush()
     src_file.close()
 
     utils.progress('Compiling ' + src_filename)
+
     compiler_cmd = languages[src_extension]['compiler'].substitute(src_filebase=src_filebase, src_filename=src_filename)
     if compiler_cmd is not None:
       compiler_cmd = compiler_cmd.split()
@@ -60,33 +47,3 @@ def compile(payload, src_filebase, src_extension, src_filename):
 
     if not os.path.exists(check_for):
       raise GradingException('Compiler error')
-
-def grade(q, task, callback, **kwargs):
-  '''Sets up a file-based submission for grading, then calls a callback for grading.
-  
-  Sets up a sandbox directory, compiles the program, and calls the callback function for grading.'''
-
-  correct = False
-  metadata = {}
-
-  try:
-    sandbox_dir = tempfile.mkdtemp(prefix='proco')
-    os.chdir(sandbox_dir)
-
-    payload = task['payload']
-    team_filebase =  task['alias']
-    team_extension = task['run_metadata']['extension']
-    team_filename = team_filebase + '.' + team_extension
-    compile(payload, team_filebase, team_extension, team_filename)
-    
-    correct = callback(task, team_filebase, team_extension, team_filename, metadata)
-
-  except GradingException, e:
-    utils.progress(e.message)
-    metadata['error'] = e.message
-  except Exception, e:
-    utils.progress('Internal error')
-  finally:
-    shutil.rmtree(sandbox_dir)
-
-  q.put({'correct' : correct, 'metadata' : metadata, 'division_id' : int(task['division_id']), 'team_id' : int(task['team_id']), 'problem_id' : int(task['problem_id'])})

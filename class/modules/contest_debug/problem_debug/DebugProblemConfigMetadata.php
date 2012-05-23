@@ -77,6 +77,7 @@ class DebugProblemConfigMetadata extends ProblemConfigMetadata {
         <input type="hidden" name="contest_id" value="<?= $this->contest_id ?>"></input>
         <input type="hidden" name="action" value="upload_interactive_grader"></input>
         <br />
+        <iframe name="<?= $uploadFrameID ?>" style="width: 300px; height: 30px; border: 0px;"></iframe>
       </form>
     </td>
   </tr>
