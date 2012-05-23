@@ -1,4 +1,5 @@
 import exceptions
+import json
 import os
 import shutil
 import signal
@@ -60,9 +61,10 @@ def grade(q, task, **kwargs):
   metadata = {}
   
   try:
-    team_select = task['run_metadata']['type']
-    team_correct = task['run_metadata']['good']
-    team_wrong = task['run_metadata']['bad']
+    payload = json.loads(task['payload'])
+    team_select = payload['type']
+    team_correct = payload['good']
+    team_wrong = payload['bad']
     
     if task['division_metadata']['type'] == team_select:
       try:

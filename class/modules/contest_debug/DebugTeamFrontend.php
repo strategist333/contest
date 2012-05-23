@@ -61,10 +61,14 @@ var postReply = <?= $k_post_reply ?>;
         </select>
       </div>
     </div>
-    <div id="soln_good_label">Good Input:</div>
-    <textarea id="soln_good"></textarea>
-    <div id="soln_bad_label">Bad Input:</div>
-    <textarea id="soln_bad"></textarea>
+    <div id="soln_good_div">
+      <div id="soln_good_label">Good Input:</div>
+      <textarea id="soln_good"></textarea>
+    </div>
+    <div id="soln_bad_div">
+      <div id="soln_bad_label">Bad Input:</div>
+      <textarea id="soln_bad"></textarea>
+    </div>
     <div id="submissions_status"></div>
     <button id="debug_submit">Submit solution</button>
   </div>

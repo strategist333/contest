@@ -33,20 +33,19 @@ class DebugTeamActionHandler extends TeamActionHandler {
     }
   }
 
-  public function submit_debug_solution($json, &$ret) {
-    $ret = array('success' => false, 'error' => '');
-    if(isset($json['problem_id']) && isset($json['type'])) {
+  public function submit_debug_solution($in, &$out) {
+    if (isset($in['problem_id']) && isset($in['type'])) {
       $team_id = $_SESSION['login']['team_id'];
       $division_id = $_SESSION['login']['division_id'];
       $contest_id = $_SESSION['login']['contest_id'];
 
-      $filebase = $json['problem_id'];
+      $filebase = $in['problem_id'];
 
-      $info = DBManager::addRun($team_id, $division_id, $contest_id, $filebase, '', json_encode($json));
-      if($info['success']) {
-        $ret['success'] = true;
+      $info = DBManager::addRun($team_id, $division_id, $contest_id, $filebase, json_encode($in), '{}');
+      if( $info['success']) {
+        $out['success'] = true;
       } else {
-        $ret['error'] = $info['error'];
+        $out['error'] = $info['error'];
       }
     }
   }

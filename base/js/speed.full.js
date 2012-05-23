@@ -4,7 +4,9 @@
   var submissionsIntervalID = 0;
   var scoreboardIntervalID = 0;
   var clarificationsIntervalID = 0;
+  var submissionStatusTimeoutID = 0;
   var timerIntervalID = 0;
+  var submitAllowed = false;
   
   function formatTime(ts) {
     var h = Math.floor(ts / 3600);
@@ -127,6 +129,7 @@
       if (now < contestStartTime) {
         timeLeft = Math.ceil(contestStartTime - now);
         event = "start";
+        submitAllowed = false;
       }
       else {
         timeLeft = Math.ceil(contestEndTime - now);
@@ -134,10 +137,12 @@
         if (!$("#problems_listing").is(":visible")) {
           $("#problems_listing").load("problems.php").show();
         }
+        submitAllowed = true;
       }
       $("#timer").text(formatTime(timeLeft) + " until " + event);
     }
     else {
+      submitAllowed = false;
       $("#timer").text("Contest is over").addClass("expired");
     }
     if (now >= scoreboardFreezeTime && scoreboardIntervalID != 0) {
@@ -184,6 +189,18 @@
     });
   }
   
+  function showStatus(text) {
+    if (submissionStatusTimeoutID != 0) {
+      clearTimeout(submissionStatusTimeoutID);
+      submissionStatusTimeoutID = 0;
+    }
+    $("#submissions_upload_status").text(text);
+    submissionStatusTimeoutID = setTimeout(function() {
+      $("#submissions_upload_status").text("Select a file");
+      submissionStatusTimeoutID = 0;
+    }, 3000);
+  }
+  
   $(document).ready(function() {
     $.ajaxSetup({
       url: "handle.php",
@@ -201,30 +218,27 @@
       autoSubmit: false,
       params: {'action' : 'upload_submission', 'MAX_FILE_SIZE' : 1000000},
       onSelect: function() {
+        if (!submitAllowed) {
+          showStatus("Contest closed");
+        }
         var filename = this.filename().replace(/.*(\/|\\)(.*)/g, "$2");
         if (filename.match(/\.(c|java|cc|cpp|py)$/)) {
           this.submit();
         }
         else {
-          $("#submissions_upload_status").text("Invalid extension");
-          setTimeout(function() {
-            $("#submissions_upload_status").text("Select a file");
-          }, 5000);
+          showStatus("Invalid extension");
         }
       },
       onComplete: function(response) {
         ret = $.parseJSON(response);
         if (ret['success']) {
           var filename = this.filename().replace(/.*(\/|\\)(.*)/g, "$2");
-          $("#submissions_upload_status").text(filename + " submitted");
+          showStatus(filename + " submitted");
           loadSubmissions();
         }
         else {
-          $("#submissions_upload_status").text(ret['error']);
+          showStatus(ret['error']);
         }
-        setTimeout(function() {
-          $("#submissions_upload_status").text("Select a file");
-        }, 5000);
       }
     });
     

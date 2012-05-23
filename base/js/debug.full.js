@@ -6,6 +6,7 @@
   var clarificationsIntervalID = 0;
   var submissionStatusTimeoutID = 0;
   var timerIntervalID = 0;
+  var submitAllowed = false;
   
   function formatTime(ts) {
     var h = Math.floor(ts / 3600);
@@ -128,6 +129,7 @@
       if (now < contestStartTime) {
         timeLeft = Math.ceil(contestStartTime - now);
         event = "start";
+        submitAllowed = false;
       }
       else {
         timeLeft = Math.ceil(contestEndTime - now);
@@ -135,10 +137,12 @@
         if (!$("#problems_listing").is(":visible")) {
           $("#problems_listing").load("problems.php").show();
         }
+        submitAllowed = true;
       }
       $("#timer").text(formatTime(timeLeft) + " until " + event);
     }
     else {
+      submitAllowed = false;
       $("#timer").text("Contest is over").addClass("expired");
     }
     if (now >= scoreboardFreezeTime && scoreboardIntervalID != 0) {
@@ -211,6 +215,11 @@
     $("#submissions_status").hide();
     
     $("#debug_submit").click(function() {
+      if (!submitAllowed) {
+        showStatus("Contest closed");
+        return;
+      }
+    
       var type = $('#soln_type').val();
       var good = $.trim($('#soln_good').val());
       var bad = $.trim($('#soln_bad').val());
@@ -234,6 +243,7 @@
         success: function(ret) {
           if (ret['success']) {
             showStatus("Solution submitted");
+            loadSubmissions();
           } else {
             showStatus("Solution submission failed. Please contact contest staff.");
           }
@@ -244,16 +254,16 @@
     $("#soln_type").change(function() {
       var type = $(this).val();
       if (type == "correct") {
-        $("#soln_good").removeAttr("disabled");
-        $("#soln_bad").val("").attr("disabled", "disabled");
+        $("#soln_good_div").show();
+        $("#soln_bad_div").hide();
       }
       else if (type == "wrong") {
-        $("#soln_good").val("").attr("disabled", "disabled");
-        $("#soln_bad").removeAttr("disabled");
+        $("#soln_good_div").hide();
+        $("#soln_bad_div").show();
       }
       else {
-        $("#soln_good").removeAttr("disabled");
-        $("#soln_bad").removeAttr("disabled");
+        $("#soln_good_div").show();
+        $("#soln_bad_div").show();
       }
     }).change();
     

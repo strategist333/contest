@@ -417,7 +417,7 @@ class DBManager {
       $team_id = $run_info['team_id'];
       $problem_info = self::querySelectUnique('select problem_id, problem_type, contests_divisions_problems.alias as alias, problems.metadata as problem_metadata, division_id, division_metadata, team_id, username as team_username from teams join divisions using (division_id) join contests_divisions_problems using (division_id) join problems using (problem_id) where team_id = ? and contest_id = ? and problem_id = ?', $team_id, $contest_id, $problem_id);
       if (!$problem_info) {
-        throw new Exception('Problem not fetched.');
+        throw new Exception('Problem not fetched. ' . $team_id . ' ' . $contest_id . ' ' . $problem_id);
       }
       $res = array_merge($run_info, $problem_info);
       self::commit();
@@ -430,6 +430,10 @@ class DBManager {
       $res = false;
     }
     return $res;
+  }
+  
+  public static function fetchMetadata($problem_id, $division_id, $contest_id) {
+    return self::querySelectUnique('select problems.metadata as problem_metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where problem_id = ? and division_id = ? and contest_id = ?', $problem_id, $division_id, $contest_id);
   }
   
   public static function updateJudgment($judgment_id, $judge_id, $correct, $metadata) {

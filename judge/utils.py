@@ -24,6 +24,7 @@ def call(**kwargs):
   if not req:
     raise Exception('Failed to open connection.')
   js = req.read()
+  print js
   try:
     return json.loads(js)
   except Exception as e:
