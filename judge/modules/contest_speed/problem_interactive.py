@@ -69,11 +69,11 @@ def _run_tests(task, team_filebase, team_extension, team_filename, metadata, ver
         grader_finished = grader_executer.poll() is not None
         if not grader_finished:
           if verbose:
-            utils.progress('Grader executable did not finish; killing PID %d' % grader_executer.pid)
+            utils.progress('Grader executable did not finish; killing PID %d after %d seconds' % (grader_executer.pid, time.time() - start_time))
           os.killpg(grader_executer.pid, signal.SIGKILL)
         if team_executer.poll() is None:
           if verbose:
-            utils.progress('Team executable did not finish; killing PID %d' % team_executer.pid)
+            utils.progress('Team executable did not finish; killing PID %d after %d seconds' % (team_executer.pid, time.time() - start_time))
           os.killpg(team_executer.pid, signal.SIGKILL)
           if not grader_finished:
             raise GradingException('Time limit exceeded')

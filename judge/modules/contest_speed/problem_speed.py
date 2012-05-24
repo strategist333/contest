@@ -15,7 +15,7 @@ import common
 def _run_tests(task, team_filebase, team_extension, team_filename, metadata, verbose):
   '''Execute judge test cases.'''
 
-  time_limit = utils.languages[team_extension]['executer_time_limit']
+  time_limit = 1.0 * utils.languages[team_extension]['executer_time_limit'] * task['problem_metadata']['time_multiplier'] 
   num_test_cases = len(task['problem_metadata']['judge_io'])
   
   for index, test_case in enumerate(task['problem_metadata']['judge_io']):
@@ -39,7 +39,7 @@ def _run_tests(task, team_filebase, team_extension, team_filename, metadata, ver
       time.sleep(0.5)
     if executer.poll() is None:
       if verbose:
-        utils.progress('Team executable did not finish; killing PID %d' % executer.pid)
+        utils.progress('Team executable did not finish; killing PID %d after %d seconds' % (executer.pid, time.time() - start_time))
       os.killpg(executer.pid, signal.SIGKILL)
       raise GradingException('Time limit exceeded')
     if executer.returncode != 0:
