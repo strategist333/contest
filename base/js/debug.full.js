@@ -148,6 +148,7 @@
     if (now >= scoreboardFreezeTime && scoreboardIntervalID != 0) {
       clearInterval(scoreboardIntervalID);
       scoreboardIntervalID = 0;
+      $("#scoreboard_table_div .div_title").text("Scoreboard (frozen)");
     }
   }
   

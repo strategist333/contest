@@ -254,6 +254,7 @@ h5 {
 #ask {
   height: 30%;
   overflow-y: auto;
+  text-align: center;
 }
 
 #ask #ask_message,
@@ -303,18 +304,14 @@ h5 {
   text-align: center;
 }
 
-tr.correct {
-  background: #CCFFCC;
+tr.correct td, td.correct {
+  background-color: #cfc;
 }
 
-tr.incorrect {
-  background: #FFCCCC;
+tr.incorrect td, td.incorrect {
+  background-color: #fcc;
 }
 
-td.correct {
-  background: #CCFFCC;
-}
-
-td.incorrect {
-  background: #FFCCCC;
+.problem_link {
+  margin-bottom: 5px;
 }

@@ -124,7 +124,7 @@ class TeamFrontend {
 <div id="submissions_table_div">
   <div class="div_padding">
     <div class="div_title">Submission Results</div>
-    <table id="submissions_table" class="results_table" border="1" cellspacing="0">
+    <table id="submissions_table" class="results_table">
       <thead>
         <tr>
           <th>Time</th>
@@ -148,7 +148,7 @@ class TeamFrontend {
 <div id="scoreboard_table_div">
   <div class="div_padding">
     <div class="div_title">Scoreboard</div>
-    <table id="scoreboard_table" class="results_table" border="1" cellspacing="0">
+    <table id="scoreboard_table" class="results_table">
       <thead>
       </thead>
       <tbody>
@@ -165,14 +165,9 @@ class TeamFrontend {
 <div id="ask">   
   <div class="div_padding">
     <div class="div_title">Request Clarification</div>
-    <form>
-      <center>
-        <textarea id="ask_message" rows="5"></textarea>
-        <br />
-        <button id="ask_submit">Submit Question</button>
-      </center>
-    </form>
-
+    <textarea id="ask_message" rows="5"></textarea>
+    <br />
+    <button id="ask_submit">Submit Question</button>
   </div>
 </div>
 <?php
