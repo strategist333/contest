@@ -6,7 +6,7 @@ import tempfile
 import utils
 from utils import GradingException
 
-def autograde(q, task, verbose, callback):
+def grade(q, task, verbose, callback):
   '''Sets up a file-based submission for grading, then calls a callback for grading.
   
   Sets up a sandbox directory, compiles the program, and calls the callback function for grading.'''
@@ -34,7 +34,7 @@ def autograde(q, task, verbose, callback):
     metadata['error'] = e.message
   except Exception, e:
     utils.progress('Internal error: ' + str(e))
-    raise e
+    raise
   finally:
     if verbose:
       utils.progress('NOT removing temporary directory %s; please clean up manually!' % sandbox_dir)

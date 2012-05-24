@@ -393,7 +393,7 @@ class DBManager {
     return $res;
   }
   
-  public static function fetchRun($judge_id, $contest_id) {
+  public static function fetchTask($judge_id, $contest_id) {
     global $k_judgment_pending;
     global $k_judgment_none;
     global $k_judgment_maxdelay;
@@ -430,6 +430,10 @@ class DBManager {
       $res = false;
     }
     return $res;
+  }
+  
+  public static function fetchRun($contest_id, $team_username, $problem_alias) {
+    return self::querySelectUnique('select run_id, problem_id, team_id, payload, time_submitted, runs.metadata as run_metadata, problem_type, contests_divisions_problems.alias as alias, problems.metadata as problem_metadata, division_id, division_metadata, username as team_username from runs join teams using (team_id) join problems using (problem_id) join contests_divisions_problems using (problem_id, division_id) where contest_id = ? and username = ? and contests_divisions_problems.alias = ? order by time_submitted desc limit 1', $contest_id, $team_username, $problem_alias);
   }
   
   public static function fetchMetadata($problem_id, $division_id, $contest_id) {

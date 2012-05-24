@@ -103,7 +103,7 @@ if __name__ == '__main__':
       
       module = utils.import_module(judge.contest_type, task['problem_type'])
       q = multiprocessing.Queue()
-      grader = multiprocessing.Process(target=module.autograde, args=(q, task, False))
+      grader = multiprocessing.Process(target=module.grade, args=(q, task, False))
       grader.start()
       result = q.get()
       grader.join()

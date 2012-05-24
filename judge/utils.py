@@ -27,17 +27,16 @@ def call(**kwargs):
   if not req:
     raise Exception('Failed to open connection.')
   js = req.read()
-  print js
   try:
     return json.loads(js)
   except Exception as e:
     print js
-    raise e  
+    raise
 
 def progress(s):
   '''Outputs a progress indication.'''
   
-  if not verbose:
+  if not progress.verbose:
     sys.stdout.write('\b' * progress.last_len)
     sys.stdout.write(' ' * progress.last_len)
     sys.stdout.write('\b' * progress.last_len)

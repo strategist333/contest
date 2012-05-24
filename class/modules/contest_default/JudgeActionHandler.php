@@ -185,7 +185,7 @@ class JudgeActionHandler {
     $contest_id = $in['contest_id'];
     if ($g_curr_contest) {
       if ($g_curr_contest['contest_id'] == $contest_id) {
-        $res = DBManager::fetchRun($judge_id, $contest_id);
+        $res = DBManager::fetchTask($judge_id, $contest_id);
         if ($res) {
           $out = array_merge($out, $res);
           $out['division_metadata_hash'] = md5($out['division_metadata']);
@@ -204,6 +204,21 @@ class JudgeActionHandler {
     }
     else {
       $out['task_type'] = 'halt';
+    }
+  }
+  
+  public function fetch_run($in, &$out) {
+    global $g_curr_contest;
+    $contest_id = $g_curr_contest['contest_id'];
+    $team_username = $in['team_username'];
+    $problem_alias = $in['problem_alias'];
+    $res = DBManager::fetchRun($contest_id, $team_username, $problem_alias);
+    if ($res) {
+      $out = array_merge($out, $res);
+      $out['contest_type'] = $g_curr_contest['contest_type'];
+    }
+    else {
+      $out['success'] = false;
     }
   }
   
