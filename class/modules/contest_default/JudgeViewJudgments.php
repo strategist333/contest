@@ -155,7 +155,6 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
 <div align="center">
 <p>Last updated at:<br>
 <i><div id="last_update"></div></i></p>
-<input type="button" id="save" value="Save changes" /><br />
 <table id="runs" border="1" width="1000" cellspacing="0">
   <thead>
     <tr>
