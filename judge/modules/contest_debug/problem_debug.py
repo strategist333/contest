@@ -10,7 +10,7 @@ import tempfile
 
 import utils
 
-def run_test(grader_executer_cmd, team_input, desired_return_code):
+def _run_test(grader_executer_cmd, team_input, desired_return_code):
   '''Run an individual test and return whether it was accepted by the grader.'''
   time_limit = 5
 
@@ -30,7 +30,7 @@ def run_test(grader_executer_cmd, team_input, desired_return_code):
   else:
     return (grader_executer.returncode == desired_return_code)
 
-def run_tests(task, team_select, team_correct, team_wrong):
+def _run_tests(task, team_select, team_correct, team_wrong, verbose):
   '''Compile judge and run both test cases on the judge. '''
   
   payload = task['problem_metadata']['grader']['src']
@@ -44,17 +44,17 @@ def run_tests(task, team_select, team_correct, team_wrong):
 
   if actual_type == 'correct' or actual_type == 'sometimes':
     utils.progress('Testing team good input')
-    if not run_test(grader_executer_cmd, team_correct, 100):
+    if not _run_test(grader_executer_cmd, team_correct, 100):
       return False
 
   if actual_type == 'wrong' or actual_type == 'sometimes':
     utils.progress('Testing team bad input')
-    if not run_test(grader_executer_cmd, team_wrong, 200):
+    if not _run_test(grader_executer_cmd, team_wrong, 200):
       return False
   
   return True
 
-def grade(q, task, **kwargs):
+def autograde(q, task, verbose):
   '''Grades a debug submission.'''
   
   correct = False
@@ -70,7 +70,7 @@ def grade(q, task, **kwargs):
       try:
         sandbox_dir = tempfile.mkdtemp(prefix='proco')
         os.chdir(sandbox_dir)
-        correct = run_tests(task, team_select, team_correct, team_wrong)
+        correct = _run_tests(task, team_select, team_correct, team_wrong, verbose)
         if correct:
           utils.progress('Correct')
         else:

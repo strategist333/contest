@@ -49,7 +49,9 @@ class TeamLogin {
   function makeDynamicText(elem, text) {
     elem.focus(function() {
       $(this).removeClass("defaultInput");
-      $(this).val("");
+      if ($(this).val() == text) {
+        $(this).val("");
+      }
     });
     elem.blur(function() {
       if (!$(this).val()) {

@@ -1,3 +1,4 @@
+import difflib
 import exceptions
 import os
 import shutil
@@ -11,7 +12,7 @@ import utils
 from utils import GradingException
 import common
 
-def run_tests(task, team_filebase, team_extension, team_filename, metadata):
+def _run_tests(task, team_filebase, team_extension, team_filename, metadata, verbose):
   '''Execute judge test cases.'''
 
   time_limit = utils.languages[team_extension]['executer_time_limit']
@@ -40,13 +41,17 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
     stdout.seek(0)
     team_output = stdout.read()
    
-    if map(lambda line: line.strip(), team_output.split('\n')) != map(lambda line: line.strip(), test_case['output'].split('\n')):
+    team_output_lines = map(lambda line: line.strip(), team_output.splitlines())
+    judge_output_lines = map(lambda line: line.strip(), test_case['output'].splitlines())
+    if team_output_lines != judge_output_lines:
+      if verbose:
+        sys.stdout.writelines(result)
       raise GradingException('Incorrect output')
     utils.progress('Passed %2d / %2d' % (index + 1, num_test_cases))
   utils.progress('Correct')
   return True
 
-def grade(q, task, **kwargs):
+def autograde(q, task, verbose):
   '''Grades a speed submission.'''
 
-  return common.setup(q, task, run_tests, **kwargs)
+  return common.autograde(q, task, verbose, _run_tests)

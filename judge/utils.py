@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import exceptions
+import importlib
 import json
 import os
 import urllib2
@@ -11,6 +12,8 @@ from string import Template
 import config
 
 def init():
+  '''Initialize Basic Auth handler.'''
+  
   pwd_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
   pwd_manager.add_password(None, config.handle_url, config.username, config.password)
   authhandler = urllib2.HTTPBasicAuthHandler(pwd_manager)
@@ -34,17 +37,37 @@ def call(**kwargs):
 def progress(s):
   '''Outputs a progress indication.'''
   
-  sys.stdout.write('\b' * progress.last_len)
-  sys.stdout.write(' ' * progress.last_len)
-  sys.stdout.write('\b' * progress.last_len)
+  if not verbose:
+    sys.stdout.write('\b' * progress.last_len)
+    sys.stdout.write(' ' * progress.last_len)
+    sys.stdout.write('\b' * progress.last_len)
+    
+    sys.stdout.write(s)
+    sys.stdout.flush()
+    progress.last_len = len(s)
+  else:
+    print s
   
-  sys.stdout.write(s)
-  sys.stdout.flush()
-  progress.last_len = len(s)
-  
-def reset_progress():
+def reset_progress(verbose):
   progress.last_len = 0
+  progress.verbose = verbose
 
+def import_module(contest_type, problem_type):  
+  def module_name(contest_type, problem_type):
+    return 'modules.' + 'contest_' + contest_type + '.' + 'problem_' + problem_type;
+  modules = []
+  modules.append(module_name(contest_type, problem_type));
+  modules.append(module_name(contest_type, 'default'));
+  modules.append(module_name('default', problem_type));
+  modules.append(module_name('default', 'default'));
+  for module in modules:
+    try:
+      return importlib.import_module(module)
+    except Exception, e:
+      print e
+      pass
+  raise Exception('No module found for %s.%s' % (contest_type, problem_type))
+  
 languages = {
   'c'    : dict(compiler=Template('gcc -o $src_filebase $src_filename'),
                 check_for=Template('$src_filebase'),

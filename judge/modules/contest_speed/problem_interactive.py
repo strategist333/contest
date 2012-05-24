@@ -12,7 +12,7 @@ import utils
 from utils import GradingException
 import common
 
-def run_tests(task, team_filebase, team_extension, team_filename, metadata):
+def _run_tests(task, team_filebase, team_extension, team_filename, metadata, verbose):
   '''Compile interactive grader, and execute judge test cases.'''
   
   try:
@@ -80,11 +80,9 @@ def run_tests(task, team_filebase, team_extension, team_filename, metadata):
     finally:
       os.remove(input_filename)
   utils.progress('Correct')
-  return True
+  return True  
   
-  
-  
-def grade(q, task, **kwargs):
+def autograde(q, task, verbose):
   '''Grades an interactive submission.'''
 
-  return common.setup(q, task, run_tests, **kwargs)
+  return common.autograde(q, task, verbose, _run_tests)

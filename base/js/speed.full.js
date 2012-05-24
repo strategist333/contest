@@ -232,13 +232,13 @@
       onComplete: function(response) {
         ret = $.parseJSON(response);
         if (ret['success']) {
-          var filename = this.filename().replace(/.*(\/|\\)(.*)/g, "$2");
-          showStatus(filename + " submitted");
+          showStatus(ret['filename'] + " submitted");
           loadSubmissions();
         }
         else {
           showStatus(ret['error']);
         }
+        
       }
     });
     

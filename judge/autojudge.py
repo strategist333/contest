@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import importlib
 import json
 import multiprocessing
 import time
@@ -8,7 +7,7 @@ import sys
 import config
 import utils
 
-class Judge:
+class AutoJudge:
   '''The entity that communicates with the server.'''
   
   def __init__(self):
@@ -79,26 +78,9 @@ class Judge:
   def __str__(self):
     return 'judge_id %d, contest_id %d' % (self.judge_id, self.contest_id)
 
-def _module_name(contest_type, problem_type):
-  return 'modules.' + 'contest_' + contest_type + '.' + 'problem_' + problem_type;
-
-def _import_module(contest_type, problem_type):
-  modules = []
-  modules.append(_module_name(contest_type, problem_type));
-  modules.append(_module_name(contest_type, 'default'));
-  modules.append(_module_name('default', problem_type));
-  modules.append(_module_name('default', 'default'));
-  for module in modules:
-    try:
-      return importlib.import_module(module)
-    except Exception, e:
-      print e
-      pass
-  raise Exception('No module found for %s.%s' % (contest_type, problem_type))
-
 if __name__ == '__main__':
   utils.init()
-  judge = Judge()
+  judge = AutoJudge()
   print time.strftime('[%H:%M:%S]:', time.localtime()),
   print 'Initialized judge to %s' % judge
   
@@ -109,7 +91,7 @@ if __name__ == '__main__':
     if task_type == 'grade':
       task['run_metadata'] = json.loads(task['run_metadata'])
       print 'Grading run_id %s (team %s, problem %s) of type %s... ' % (task['run_id'], task['team_username'], task['alias'], task['problem_type']),
-      utils.reset_progress()
+      utils.reset_progress(False)
       
       problem_metadata, division_metadata = judge.get_cached_metadata(task['problem_id'], task['division_id'], task['problem_metadata_hash'], task['division_metadata_hash'])
       if problem_metadata is None or division_metadata is None:
@@ -119,16 +101,16 @@ if __name__ == '__main__':
       task['problem_metadata'] = problem_metadata
       task['division_metadata'] = division_metadata
       
-      module = _import_module(judge.contest_type, task['problem_type'])
+      module = utils.import_module(judge.contest_type, task['problem_type'])
       q = multiprocessing.Queue()
-      grader = multiprocessing.Process(target=module.grade, args=(q, task,))
+      grader = multiprocessing.Process(target=module.autograde, args=(q, task, False))
       grader.start()
       result = q.get()
       grader.join()
       print
       judge.submit_judgment(judgment_id=int(task['judgment_id']), **result)
     elif task_type == 'reset':
-      judge = Judge()
+      judge = AutoJudge()
       print 'Reset judge to %s' % judge
     elif task_type == 'halt':
       print 'Shutting down'

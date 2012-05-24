@@ -35,6 +35,7 @@ class TeamLoadHandler {
         $info = DBManager::addRun($team_id, $division_id, $contest_id, $filebase, $payload, json_encode($metadata));
         if ($info['success']) {
           $ret['success'] = true;
+          $ret['filename'] = $filename;
         }
         else {
           $ret['error'] = $info['error'];
