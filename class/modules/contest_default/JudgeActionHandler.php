@@ -246,6 +246,12 @@ class JudgeActionHandler {
     $judgment_id = $in['judgment_id'];
     $out['success'] = (DBManager::clearJudgment($judgment_id) == 1);
   }
+  
+  public function clear_judgments($in, &$out) {
+    $problem_id = $in['problem_id'];
+    $contest_id = $in['contest_id'];
+    DBManager::clearJudgments($problem_id, $contest_id);
+  }
     
   public function get_posts($in, &$out) {
     $contest_id = $in['contest_id'];

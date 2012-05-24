@@ -134,14 +134,37 @@ class JudgeConfigProblem {
       $.each(divisionMap, function(divisionID, divisionName) {
         var problem = problemDivisionMap[problemID][divisionID];
         var row = $("<tr>").attr("id", "problem_" + problemID + "_" + divisionID);
-        var problemIDTD = $("<td>");
+        var firstTD = $("<td>");
         if (isFirst) {
-          row.append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'order_seq', true)));
-        }
-        else {
-          row.append($("<td>"));
-        }
-        row.append($("<td>").text(divisionMap[divisionID]))
+          firstTD.append(makeInput(problemID, divisionID, contestID, problem, 'order_seq', true));
+<?php
+    if ($g_curr_contest) {
+?>
+          if (contestID == <?= $g_curr_contest['contest_id'] ?>) {
+            firstTD.append("<br>")
+                   .append($("<button>").text("Regrade").click((function(pID, title, cID) {
+                             return function() {
+                               if (confirm("Are you sure you want to regrade all submissions for " + title + "?")) {
+                                 $.ajax({
+                                   data: $.stringifyJSON({'action' : 'clear_judgments', 'contest_id' : cID, 'problem_id' : pID}),
+                                   success: function(ret) {
+                                     if (ret['success']) {
+                                       alert("Successfully cleared all judgments for " + title);
+                                     }
+                                     else {
+                                       alert("Regrade request failed!");
+                                     }
+                                   }
+                                 });
+                               }
+                             };
+                           })(problemID, problem['title'], contestID)));
+          }
+<?php
+    }
+?>      }
+        row.append(firstTD)
+           .append($("<td>").text(divisionMap[divisionID]))
            .append($("<td>").append(makeCheck(problemID, divisionID, contestID, problem['valid'])));
         isFirst = false;
         loadRow(row, problemID, divisionID, $("#contest_id").val(), problem);

@@ -452,6 +452,12 @@ class DBManager {
     return self::queryUpdate('update judgments set time_updated = unix_timestamp(), judge_id = 0, metadata = ?, status = ? where judgment_id = ?', $metadata, $k_judgment_none, $judgment_id);
   }
   
+  public static function clearJudgments($problem_id, $contest_id) {
+    global $k_judgment_none;
+    $metadata = '{}';
+    return self::queryUpdate('update judgments set time_updated = unix_timestamp(), judge_id = 0, metadata = ?, status = ? where run_id in (select run_id from runs join teams using (team_id) join divisions using (division_id) join contests_divisions_problems using(problem_id, division_id) where problem_id = ? and contest_id = ?)', $metadata, $k_judgment_none, $problem_id, $contest_id);
+  }
+  
   public static function getContestDivisionJudgments($contest_id, $division_id) {
     global $k_judgment_correct;
     global $k_judgment_incorrect;
