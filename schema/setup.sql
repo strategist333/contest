@@ -90,7 +90,7 @@ CREATE TABLE `runs` (
   `run_id` int(11) NOT NULL AUTO_INCREMENT,
   `problem_id` int(11) NOT NULL,
   `team_id` int(11) NOT NULL,
-  `payload` mediumblob NOT NULL,
+  `payload` longblob NOT NULL,
   `time_submitted` int(11) NOT NULL,
   `metadata` longtext NOT NULL,
   `status` tinyint(3) NOT NULL,
