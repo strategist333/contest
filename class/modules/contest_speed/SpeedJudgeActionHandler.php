@@ -16,5 +16,34 @@ class SpeedJudgeActionHandler extends JudgeActionHandler {
       $out['error'] = $e->getMessage();
     }
   }
+  
+  public function load_scoreboard($in, &$out) {
+    global $g_curr_contest;
+    if ($g_curr_contest) {
+      $contest_id = $g_curr_contest['contest_id'];
+      $division_id = $in['division_id'];
+      $metadata = DBManager::getContestDivisionMetadata($contest_id, $division_id);
+      if ($metadata) {
+        $metadata = json_decode($metadata, true);
+        if (!(isset($metadata['judge_scoreboard']) && isset($metadata['problems']))) {
+          SpeedScoreboardManager::generateScoreboard($contest_id, $division_id);
+          $metadata = DBManager::getContestDivisionMetadata($contest_id, $division_id);
+          $metadata = json_decode($metadata, true);
+        }
+        if (isset($metadata['judge_scoreboard']) && isset($metadata['problems'])) {
+          $out['scoreboard'] = array('teams' => $metadata['judge_scoreboard'], 'problems' => $metadata['problems']);
+          foreach ($out['scoreboard']['teams'] as &$teams) {
+            unset($teams['team_id']);
+          }
+        }
+        else {
+          $out['success'] = false;
+        }
+      }
+    }
+    else {
+      $out['success'] = false;
+    }
+  }
 }
 ?>

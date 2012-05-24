@@ -24,7 +24,7 @@ class TeamFrontend {
 <?php
     $this->renderHeader();
     $this->renderBody();
-    //$this->renderFooter();
+    $this->renderFooter();
 ?>
 </div>
 <?php
@@ -59,14 +59,6 @@ class TeamFrontend {
   
   protected function renderFooter() {
 // BEGIN RENDER FOOTER
-?>
-<div id="footer">
-<span>
-  <div id="quote_marquee">
-  </div>
-</span>
-</div>
-<?php
 // END RENDER FOOTER
   }
   

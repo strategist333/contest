@@ -18,6 +18,7 @@ class SpeedTeamFrontend extends TeamFrontend {
 <script type="text/javascript">
 var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
 var contestEndTime = <?= $g_curr_contest['time_start'] + $g_curr_contest['time_length'] ?>;
+var scoreboardFreezeTime = <?= $g_curr_contest['time_start'] + $metadata['time_freeze'] ?>;
 var judgmentCorrect = <?= $k_judgment_correct ?>;
 var judgmentIncorrect = <?= $k_judgment_incorrect ?>;
 var postBroadcast = <?= $k_post_broadcast ?>;

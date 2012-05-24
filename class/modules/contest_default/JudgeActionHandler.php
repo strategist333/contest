@@ -266,5 +266,6 @@ class JudgeActionHandler {
     $message = $in['message'];
     $out['success'] = (DBManager::broadcastPost($contest_id, $message) == 1);
   }
+  
 }
 ?>
