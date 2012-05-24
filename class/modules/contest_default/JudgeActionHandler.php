@@ -241,6 +241,11 @@ class JudgeActionHandler {
     $metadata = $in['metadata'];
     $out['success'] = (DBManager::updateJudgment($judgment_id, $judge_id, $correct, $metadata) == 1);
   }
+  
+  public function clear_judgment($in, &$out) {
+    $judgment_id = $in['judgment_id'];
+    $out['success'] = (DBManager::clearJudgment($judgment_id) == 1);
+  }
     
   public function get_posts($in, &$out) {
     $contest_id = $in['contest_id'];
@@ -267,5 +272,29 @@ class JudgeActionHandler {
     $out['success'] = (DBManager::broadcastPost($contest_id, $message) == 1);
   }
   
+  public function get_runs($in, &$out) {
+    global $k_judgment_none;
+    global $k_judgment_pending;
+    $contest_id = $in['contest_id'];
+    $count = $in['count'];
+    $res = DBmanager::getRuns($contest_id, $count);
+    if ($res) {
+      $out['pending'] = array();
+      $out['done'] = array();
+      foreach ($res as $run) {
+        $run['run_metadata'] = json_decode($run['run_metadata'], true);
+        $run['judgment_metadata'] = json_decode($run['judgment_metadata'], true);
+        if ($run['judgment'] == $k_judgment_none || $run['judgment'] == $k_judgment_pending) {
+          array_push($out['pending'], $run);
+        }
+        else {
+          array_push($out['done'], $run);
+        }
+      }
+    }
+    else {
+      $out['success'] = false;
+    }
+  }
 }
 ?>

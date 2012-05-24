@@ -443,7 +443,13 @@ class DBManager {
   public static function updateJudgment($judgment_id, $judge_id, $correct, $metadata) {
     global $k_judgment_correct;
     global $k_judgment_incorrect;
-    return self::queryUpdate('update judgments set time_updated = unix_timestamp(), metadata = ?, status = ? where judgment_id = ? and judge_id = ?', $metadata, ($correct ? $k_judgment_correct : $k_judgment_incorrect), $judgment_id, $judge_id);
+    return self::queryUpdate('update judgments set time_updated = unix_timestamp(), metadata = ?, status = ?, judge_id = ? where judgment_id = ?', $metadata, ($correct ? $k_judgment_correct : $k_judgment_incorrect), $judge_id, $judgment_id);
+  }
+  
+  public static function clearJudgment($judgment_id) {
+    global $k_judgment_none;
+    $metadata = '{}';
+    return self::queryUpdate('update judgments set time_updated = unix_timestamp(), judge_id = 0, metadata = ?, status = ? where judgment_id = ?', $metadata, $k_judgment_none, $judgment_id);
   }
   
   public static function getContestDivisionJudgments($contest_id, $division_id) {
@@ -503,6 +509,10 @@ class DBManager {
       $posts = self::querySelect('select post_id, team_id, username, ref_id, text, time_posted, posts.status as status from posts left join teams using (team_id) where contest_id = ? and posts.status in (' . implode(',', $statuses) . ') order by time_posted desc, post_id desc', $contest_id);
     }
     return $posts;
+  }
+  
+  public static function getRuns($contest_id, $count) {
+    return self::querySelect('select time_submitted, username, division_id, division_name, contests_divisions_problems.alias as problem_alias, judgments.status as judgment, runs.metadata as run_metadata, judgments.metadata as judgment_metadata, judgment_id from runs join judgments using (run_id) join teams using (team_id) join divisions using (division_id) join problems using (problem_id) join contests_divisions_problems using (problem_id, division_id) where contest_id = ? order by time_submitted desc limit ' . $count, $contest_id);
   }
 }
 ?>
