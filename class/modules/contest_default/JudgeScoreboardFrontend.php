@@ -73,14 +73,12 @@ class JudgeScoreboardFrontend extends JudgeFrontend {
           $.each(scoreboard['problems'], function(index, problem) {
             thr.append($("<th>").text(problem['alias']));
           });
-          thr.append($("<th>").text("Score"));
+          thr.append($("<th>").text("Time"))
+             .append($("<th>").text("Score"));
           var tbody = $("<tbody>");
           $.each(scoreboard['teams'], function(index, team) {
             var tr = $("<tr>").append($("<td>").text(index + 1))
                               .append($("<td>").text(team['alias']));
-            if (team.hasOwnProperty('me')) {
-              tr.addClass('me');
-            }
             $.each(team['judgments'], function(index, judgment) {
               var td = $("<td>").text(" ");
               if (judgment == judgmentCorrect) {
@@ -91,6 +89,7 @@ class JudgeScoreboardFrontend extends JudgeFrontend {
               }
               tr.append(td);
             });
+            tr.append($("<td>").text(team['time'] ? formatTime(team['time'] - contestStartTime) : '---'));
             tr.append($("<td>").text(team['score']));
             tbody.append(tr);
           });
