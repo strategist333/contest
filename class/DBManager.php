@@ -278,7 +278,7 @@ class DBManager {
   }
   
   public static function getContestProblems($contest_id) {
-    return self::querySelect('select problem_id, problem_type, title, order_seq, status, division_id, url, alias, metadata, division_metadata from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, problem_id asc, division_id asc', $contest_id);
+    return self::querySelect('select problem_id, problem_type, title, order_seq, status, division_id, url, alias from problems join contests_divisions_problems using (problem_id) where contest_id = ? order by order_seq asc, problem_id asc, division_id asc', $contest_id);
   }
   
   public static function getContestDivisionProblems($contest_id, $division_id) {

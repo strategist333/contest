@@ -110,7 +110,7 @@ class JudgeConfigProblem {
            .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'title', true)))
            .append($("<td>").append(makeProblemTypeDropdown(problemID, divisionID, contestID, problem, 'problem_type', true)))
            .append($("<td>").append(makeInput(problemID, divisionID, contestID, problem, 'url', false)))
-           .append($("<td>").load("problemmetadata.php", {'data' : $.stringifyJSON({'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'metadata' : problem['metadata'], 'division_metadata' : problem['division_metadata'], 'problem_type' : problem['problem_type']})}));
+           .append($("<td>").load("problemmetadata.php", {'data' : $.stringifyJSON({'problem_id' : problemID, 'division_id' : divisionID, 'contest_id' : contestID, 'problem_type' : problem['problem_type']})}));
       }
       else {
         row.append($("<td>").attr("colspan", 5).text("Not used"));
@@ -285,12 +285,15 @@ foreach (DBManager::getContestTypes() as $contest_type) {
           </tr>
         </thead>
         <tbody>
+          <tr>
+          </tr>
         </tbody>
         <tfoot>
           <tr>
             <td colspan="8">
               <button id="new_problem">Create new problem in </button>
               <select id="new_problem_division_id">
+                <option></option>
               </select>
             </td>
           </tr>
