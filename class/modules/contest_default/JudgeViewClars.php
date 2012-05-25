@@ -102,6 +102,7 @@ class JudgeViewClars {
       success: function() {
         $("#reply_id").val('');
         $("#response").val('');
+        loadClars();
       }
     });
   }
