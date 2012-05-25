@@ -19,7 +19,7 @@ class SpeedJudgeActionHandler extends JudgeActionHandler {
   
   public function clear_judgment($in, &$out) {
     parent::clear_judgment($in, $out);
-    DebugScoreboardManager::generateScoreboard($in['contest_id'], $in['division_id']);
+    SpeedScoreboardManager::generateScoreboard($in['contest_id'], $in['division_id']);
   }
   
   public function load_scoreboard($in, &$out) {

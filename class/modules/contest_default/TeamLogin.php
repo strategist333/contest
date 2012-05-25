@@ -100,9 +100,7 @@ class TeamLogin {
 ?>
 
 </div>
-<div id="footer">
 <?php footer(); ?>
-</div>
 </body>
 </html>
 

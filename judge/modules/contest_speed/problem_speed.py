@@ -1,7 +1,5 @@
 import difflib
-import exceptions
 import os
-import shutil
 import signal
 from string import Template
 import subprocess

@@ -50,7 +50,6 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
           var tbody = $("<tbody>");
           $.each(ret['pending'], function(index, run) {
             var tr = $("<tr>")
-              .append($("<td>").text(run['judgment_id']))
               .append($("<td>").text(formatTime(run['time_submitted'] - contestStartTime)))
               .append($("<td>").text(run['username']))
               .append($("<td>").text(run['division_name']))
@@ -64,7 +63,6 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
           });
           $.each(ret['done'], function(index, run) {
             var tr = $("<tr>")
-              .append($("<td>").text(run['judgment_id']))
               .append($("<td>").text(formatTime(run['time_submitted'] - contestStartTime)))
               .append($("<td>").text(run['username']))
               .append($("<td>").text(run['division_name']))
@@ -81,8 +79,10 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
                   if (errorMessage) {
                     $.ajax({
                       data: $.stringifyJSON({'action' : 'submit_judgment', 'judgment_id' : judgmentID, 'judge_id' : 0, 'correct' : false, 'metadata' : $.stringifyJSON({'error' : errorMessage}), 'contest_id' : <?= $g_curr_contest['contest_id'] ?>, 'division_id' : divisionID}),
-                      success: function() {
-                        loadRuns();
+                      success: function(ret) {
+                        if (ret['success']) {
+                          loadRuns();
+                        }
                       }
                     });
                   }
@@ -97,21 +97,25 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
                   if (confirm("Update (" + username + ", " + problem + ") to correct?")) {
                     $.ajax({
                       data: $.stringifyJSON({'action' : 'submit_judgment', 'judgment_id' : judgmentID, 'judge_id' : 0, 'correct' : true, 'metadata' : '{}', 'contest_id' : <?= $g_curr_contest['contest_id'] ?>, 'division_id' : divisionID}),
-                      success: function() {
-                        loadRuns();
+                      success: function(ret) {
+                        if (ret['success']) {
+                          loadRuns();
+                        }
                       }
                     });
                   }
                 }
               })(run['username'], run['problem_alias'], run['judgment_id'], run['division_id'])));
             }
-            updateTD.append($("<button>").text("Pending").click((function(username, problem, judgmentID, divisionID) {
+            updateTD.append($("<button>").text("Regrade").click((function(username, problem, judgmentID, divisionID) {
               return function() {
                 if (confirm("Update (" + username + ", " + problem + ") to pending?")) {
                   $.ajax({
                     data: $.stringifyJSON({'action' : 'clear_judgment', 'judgment_id' : judgmentID, 'contest_id' : <?= $g_curr_contest['contest_id'] ?>, 'division_id' : divisionID}),
-                    success: function() {
-                      loadRuns();
+                    success: function(ret) {
+                      if (ret['success']) {
+                        loadRuns();
+                      }
                     }
                   });
                 }
@@ -150,15 +154,15 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
 <body>
 <div align="center">
 <h1>Hand Down Judgments!</h1>
-</div>
+<?php
+print judgeLinkPanel();
+?>
 <hr>
-<div align="center">
 <p>Last updated at:<br>
 <i><div id="last_update"></div></i></p>
 <table id="runs" border="1" width="1000" cellspacing="0">
   <thead>
     <tr>
-      <th>Judgment ID</th>
       <th>Time</th>
       <th>Username</th>
       <th>Division</th>

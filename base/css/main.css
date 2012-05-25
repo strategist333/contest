@@ -83,10 +83,8 @@ th, td {
 }
 
 #footer {
-  position: absolute; 
-  height: 32px; 
-  bottom: 0; left: 0; right: 0;
-  z-index: 15;
+  margin: 10px;
+  text-align: center;
 }
 
 .div_padding {

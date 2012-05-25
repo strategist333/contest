@@ -250,10 +250,11 @@ class JudgeConfigProblem {
 </head>
 <body>
 <div align="center">
-  <h1>Judge Problem Configuration</h1>
-</div>
+<h1>Judge Problem Configuration</h1>
+<?php
+print judgeLinkPanel();
+?>
 <hr>
-<div align="center">
 <table>
   <tr>
     <td>

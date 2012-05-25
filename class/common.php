@@ -49,11 +49,30 @@ function loadWithPrefix($curr_contest_type, $prefix, $base_class_name) {
   return loadClassInfo($curr_contest_type, $class_names, array_slice(func_get_args(), 3));
 }
 
+function judgeLinkPanel() {
+?>
+<div>
+Configure: 
+<a href="contests.php">Contests</a>
+<a href="divisions.php">Divisions</a>
+<a href="teams.php">Teams</a>
+<a href="problems.php">Problems</a>
+|
+Monitor:
+<a href="index.php">Scoreboard</a>
+<a href="clars.php">Clarifications</a>
+<a href="judgments.php">Judgments</a>
+</div>
+<?php
+}
+
 function footer() {
-  print <<<HEREDOC
-<p><small>
-Copyright (c) 2010-12 Frank Li, Frank Chen, Wendy Mu<br>
-</small></p>
-HEREDOC;
+?>
+<div id="footer">
+<small>
+Copyright (c) 2010-12 Frank Li, Frank Chen, Wendy Mu
+</small>
+</div>
+<?php
 }
 ?>

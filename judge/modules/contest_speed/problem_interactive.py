@@ -1,4 +1,3 @@
-import exceptions
 import os
 import signal
 from string import Template

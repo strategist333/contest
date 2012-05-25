@@ -4,6 +4,7 @@ import importlib
 import json
 import os
 import urllib2
+import signal
 import subprocess
 import sys
 import time

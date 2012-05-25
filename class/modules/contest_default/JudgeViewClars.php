@@ -128,12 +128,11 @@ class JudgeViewClars {
 </head>
 <body>
 <div align="center">
-  <h1>Judge Clarifications</h1>
-</div>
-
-<hr />
-<div align="center">
-
+<h1>Judge Clarifications</h1>
+<?php
+print judgeLinkPanel();
+?>
+<hr>
 Reply to post ID (0 for broadcast): <br />
 <input type="text" id="reply_id" style="width: 100px;"></input> <br />
 Message (blank to simply mark as replied): <br />
