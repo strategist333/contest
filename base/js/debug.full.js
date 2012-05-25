@@ -234,6 +234,9 @@
         return;
       }
       $("#submissions_status").text("Submitting solution...");
+      $("#soln_good").val("");
+      $("#soln_bad").val("");
+      $("#debug_submit").attr("disabled", "disabled");
       $.ajax({
         data: $.stringifyJSON({
          'action': 'submit_debug_solution',
@@ -249,6 +252,7 @@
           } else {
             showStatus("Solution submission failed. Please contact contest staff.");
           }
+          $("#debug_submit").removeAttr("disabled");
         }
       });
     });
