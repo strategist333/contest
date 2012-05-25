@@ -162,6 +162,7 @@ class JudgeScoreboardFrontend extends JudgeFrontend {
     $.ajaxSetup({
       url: "/restricted/handle.php",
       type: "post",
+      jsonp: false,
       processData: false,
       dataType: "json"
     });

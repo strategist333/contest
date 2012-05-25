@@ -153,6 +153,7 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
     $.ajaxSetup({
       url: "handle.php",
       type: "post",
+      jsonp: false,
       processData: false,
       dataType: "json"
     });

@@ -20,6 +20,7 @@ class JudgeConfigTeam {
     $.ajaxSetup({
       url: "handle.php",
       type: "post",
+      jsonp: false,
       processData: false,
       dataType: "json"
     });
