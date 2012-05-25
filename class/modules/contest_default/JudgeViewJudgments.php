@@ -44,7 +44,7 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
   
   function loadRuns() {
     $.ajax({
-      data: $.stringifyJSON({'action' : 'get_runs', 'contest_id' : <?= $g_curr_contest['contest_id'] ?>, 'count' : 200}),
+      data: $.stringifyJSON({'action' : 'get_runs', 'contest_id' : <?= $g_curr_contest['contest_id'] ?>, 'count' : parseInt($("#num_runs").val())}),
       success: function(ret) {
         if (ret['success']) {
           var tbody = $("<tbody>");
@@ -57,8 +57,23 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
             var payloadTD = $("<td>");
             renderPayloadTD(run, payloadTD);
             tr.append(payloadTD);
-            tr.addClass("pending").append($("<td>").text("Pending"));
-            tr.append($("<td>").text("Update"));
+            tr.addClass("pending").append($("<td>").text("Pending"))
+              .append($("<td>").text(formatTime(run['time_updated'] - contestStartTime)))
+              .append($("<td>").text(formatTime(run['time_updated'] - run['time_submitted'])));
+            tr.append($("<td>").append($("<button>").text("Regrade").click((function(username, problem, judgmentID, divisionID) {
+                        return function() {
+                          if (confirm("Update (" + username + ", " + problem + ") to pending?")) {
+                            $.ajax({
+                              data: $.stringifyJSON({'action' : 'clear_judgment', 'judgment_id' : judgmentID, 'contest_id' : <?= $g_curr_contest['contest_id'] ?>, 'division_id' : divisionID}),
+                              success: function(ret) {
+                                if (ret['success']) {
+                                  loadRuns();
+                                }
+                              }
+                            });
+                          }
+                        }
+                      })(run['username'], run['problem_alias'], run['judgment_id'], run['division_id']))));
             tbody.append(tr);
           });
           $.each(ret['done'], function(index, run) {
@@ -107,6 +122,8 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
                 }
               })(run['username'], run['problem_alias'], run['judgment_id'], run['division_id'])));
             }
+            tr.append($("<td>").text(formatTime(run['time_updated'] - contestStartTime)))
+              .append($("<td>").text(formatTime(run['time_updated'] - run['time_submitted'])));
             updateTD.append($("<button>").text("Regrade").click((function(username, problem, judgmentID, divisionID) {
               return function() {
                 if (confirm("Update (" + username + ", " + problem + ") to pending?")) {
@@ -142,12 +159,19 @@ var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
     
     loadRuns();
     setInterval(loadRuns, 15000);
+    $("#refresh").click(loadRuns);
   });
 })(window.jQuery);
 </script>
 <style type="text/css">
+#runs {
+  width: 90%;
+}
 #runs td {
   text-align: center;
+}
+#num_runs {
+  width: 30px;
 }
 </style>
 </head>
@@ -160,16 +184,22 @@ print judgeLinkPanel();
 <hr>
 <p>Last updated at:<br>
 <i><div id="last_update"></div></i></p>
-<table id="runs" border="1" width="1000" cellspacing="0">
+<p>
+Display <input id="num_runs" type="text" value="50" /> runs
+<button id="refresh">Refresh</button>
+</p>
+<table id="runs" border="1">
   <thead>
     <tr>
       <th>Time</th>
       <th>Username</th>
       <th>Division</th>
       <th>Problem Alias</th>
-      <th width="200">Payload</th>
-      <th width="160">Judgment</th>
-      <th width="60">Update</th>
+      <th>Payload</th>
+      <th>Judgment</th>
+      <th>Updated</th>
+      <th>Elapsed</th>
+      <th>Update</th>
     </tr>
   </thead>
   <tbody>

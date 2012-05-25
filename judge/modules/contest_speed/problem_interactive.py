@@ -14,6 +14,10 @@ import common
 def _run_tests(task, team_filebase, team_extension, team_filename, metadata, verbose):
   '''Compile interactive grader, and execute judge test cases.'''
   
+  if not task['problem_metadata']['grader']['valid']:
+    utils.progress('No grader found.')
+    raise Exception('No interactive grader found!')
+  
   try:
     payload = task['problem_metadata']['grader']['src']
     grader_filebase =  task['problem_metadata']['grader']['filebase']

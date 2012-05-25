@@ -15,7 +15,7 @@ class InteractiveProblemConfigMetadata extends ProblemConfigMetadata {
       $this->needs_update = true;
     }
     if (!isset($this->metadata['grader'])) {
-      $this->metadata['grader'] = array();
+      $this->metadata['grader'] = array('valid' => false);
       $this->needs_update = true;
     }
   }

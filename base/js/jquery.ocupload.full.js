@@ -258,9 +258,13 @@ THE SOFTWARE.
 
                     /** Do something on complete */
                     self.onComplete(response);
+
+                    /** Reset up object to allow reselection */
+                    element.siblings().remove();
+                    element.unwrap();
+                    $.ocupload(element, options);
                 });
                 
-                input.attr('value', '');
             }
         });
     };

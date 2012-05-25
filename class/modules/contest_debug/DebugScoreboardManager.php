@@ -69,6 +69,12 @@ class DebugScoreboardManager {
           if ($a['time'] == $b['time']) {
             return strcmp($a['alias'], $b['time']);
           }
+          if ($a['time'] == 0) {
+            return 1;
+          }
+          if ($b['time'] == 0) {
+            return -1;
+          }
           return $a['time'] > $b['time'] ? 1 : -1;
         }
         return $a['score'] > $b['score'] ? -1 : 1;

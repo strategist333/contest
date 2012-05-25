@@ -179,7 +179,7 @@ class SpeedJudgeLoadHandler extends JudgeLoadHandler {
             $payload = fread($file, filesize($tmpname));  
             fclose($file);
             
-            $metadata['grader'] = array('src' => $payload, 'filebase' => $filebase, 'extension' => $extension);
+            $metadata['grader'] = array('valid' => true, 'src' => $payload, 'filebase' => $filebase, 'extension' => $extension);
             DBManager::modifyProblem($problem_id, 'metadata', json_encode($metadata));
             print 'Grader updated.<br />';
           }
