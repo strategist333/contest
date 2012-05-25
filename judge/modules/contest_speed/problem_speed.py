@@ -13,7 +13,7 @@ import common
 def _run_tests(task, team_filebase, team_extension, team_filename, metadata, verbose):
   '''Execute judge test cases.'''
 
-  time_limit = 1.0 * utils.languages[team_extension]['executer_time_limit'] * task['problem_metadata']['time_multiplier'] 
+  time_limit = utils.languages[team_extension]['executer_time_limit'] * task['problem_metadata']['time_multiplier'] 
   num_test_cases = len(task['problem_metadata']['judge_io'])
   
   for index, test_case in enumerate(task['problem_metadata']['judge_io']):
@@ -33,7 +33,7 @@ def _run_tests(task, team_filebase, team_extension, team_filename, metadata, ver
     
     executer = subprocess.Popen(executer_cmd, stdin=stdin, stdout=stdout, stderr=stderr, preexec_fn=os.setsid, close_fds=True)
     start_time = time.time()
-    while executer.poll() is None and (time.time() - start_time < time_limit):
+    while executer.poll() is None and (time.time() - start_time <= time_limit):
       time.sleep(0.5)
     if executer.poll() is None:
       if verbose:

@@ -24,7 +24,7 @@ var judgmentIncorrect = <?= $k_judgment_incorrect ?>;
 var postBroadcast = <?= $k_post_broadcast ?>;
 var postReply = <?= $k_post_reply ?>;
 </script>
-<script type="text/javascript" src="/js/debug.full.js"></script>
+<script type="text/javascript" src="/js/debug.min.js"></script>
 <?php
 // END RENDER SCRIPTS
   }

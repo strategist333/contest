@@ -279,6 +279,7 @@
       }
       return false;
     });
+    
     submissionsIntervalID = setInterval(loadSubmissions, 300000);
     loadSubmissions();
     scoreboardIntervalID = setInterval(loadScoreboard, 30000);

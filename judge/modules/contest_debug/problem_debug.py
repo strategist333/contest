@@ -26,7 +26,7 @@ def _run_test(grader_executer_cmd, team_input, desired_return_code, verbose):
   
   grader_executer = subprocess.Popen(grader_executer_cmd, stdin=stdin, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'), preexec_fn=os.setsid, close_fds=True)    
   start_time = time.time()
-  while grader_executer.poll() is None and time.time() - start_time < time_limit:
+  while grader_executer.poll() is None and time.time() - start_time <= time_limit:
     time.sleep(0.5)
   grader_finished = grader_executer.poll() is not None
   if grader_executer.poll() is None:

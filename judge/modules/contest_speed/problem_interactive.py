@@ -62,7 +62,7 @@ def _run_tests(task, team_filebase, team_extension, team_filename, metadata, ver
         team_executer = subprocess.Popen(team_executer_cmd, stderr=stderr, preexec_fn=team_init)
         grader_executer = subprocess.Popen(grader_executer_cmd, stderr=open(os.devnull, 'w'), preexec_fn=grader_init)
         start_time = time.time()
-        while grader_executer.poll() is None and time.time() - start_time < time_limit:
+        while grader_executer.poll() is None and time.time() - start_time <= time_limit:
           time.sleep(0.5)
         
         grader_finished = grader_executer.poll() is not None
