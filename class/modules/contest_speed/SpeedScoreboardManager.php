@@ -68,7 +68,7 @@ class SpeedScoreboardManager {
       $team_scoreboard = array();
       if (!isset($contest_metadata['time_freeze']) || ($g_curr_contest['time_start'] + $contest_metadata['time_freeze'] > time())) {
         foreach ($scoreboard as $team) {
-          array_push($team_scoreboard, array('team_id' => $team['team_id'], 'alias' => $team['alias'], 'score' => $team['score'], 'judgments' => $team['judgments']));
+          array_push($team_scoreboard, array('team_id' => $team['team_id'], 'username' => $team['username'], 'alias' => $team['alias'], 'score' => $team['score'], 'judgments' => $team['judgments']));
         }
         $metadata['team_scoreboard'] = $team_scoreboard;
       }
