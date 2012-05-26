@@ -84,6 +84,7 @@ class SpeedScoreboardManager {
   }
   
   public function setIncorrect($contest_id, $division_id, $team_id, $problem_id) {
+    global $k_judgment_correct;
     global $k_judgment_incorrect;
     try {
       DBManager::begin();
@@ -100,13 +101,13 @@ class SpeedScoreboardManager {
         throw new Exception('Scoreboard not found');
       }
       for ($team_index = 0; $team_index < count($metadata['team_scoreboard']); $team_index++) {
-        if ($metadata['team_scoreboard'][$team_index]['team_id'] == $team_id) {
+        if ($metadata['team_scoreboard'][$team_index]['team_id'] == $team_id && $metadata['team_scoreboard'][$team_index]['judgments'][$problem_index] != $k_judgment_correct) {
           $metadata['team_scoreboard'][$team_index]['judgments'][$problem_index] = $k_judgment_incorrect;
         }
       }
       
       for ($team_index = 0; $team_index < count($metadata['judge_scoreboard']); $team_index++) {
-        if ($metadata['judge_scoreboard'][$team_index]['team_id'] == $team_id) {
+        if ($metadata['judge_scoreboard'][$team_index]['team_id'] == $team_id && $metadata['team_scoreboard'][$team_index]['judgments'][$problem_index] != $k_judgment_correct) {
           $metadata['judge_scoreboard'][$team_index]['judgments'][$problem_index] = $k_judgment_incorrect;
         }
       }
