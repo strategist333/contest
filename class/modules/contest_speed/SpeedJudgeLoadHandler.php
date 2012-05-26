@@ -3,7 +3,7 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 
 class SpeedJudgeLoadHandler extends JudgeLoadHandler {
   
-  public function view_source() {
+  public function view_submission() {
     if (isset($_REQUEST['contest_id']) && isset($_REQUEST['run_id'])) {
       $contest_id = $_REQUEST['contest_id'];
       $run_id = $_REQUEST['run_id'];

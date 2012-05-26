@@ -4,6 +4,31 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 
 class DebugJudgeLoadHandler extends JudgeLoadHandler {
 
+  public function view_submission() {
+    if (isset($_REQUEST['contest_id']) && isset($_REQUEST['run_id'])) {
+      $contest_id = $_REQUEST['contest_id'];
+      $run_id = $_REQUEST['run_id'];
+      $run = DBManager::getRun($contest_id, $run_id);
+      $payload = json_decode($run['payload'], true);
+      $output = "";
+      $output .= "<html><body><pre>";
+      $output .= "Type\n";
+      $output .= "---\n";
+      $output .= $payload['type'] . "\n";
+      $output .= "---\n";
+      $output .= "Good\n";
+      $output .= "---\n";
+      $output .= $payload['good'] . "\n";
+      $output .= "---\n";
+      $output .= "Bad\n";
+      $output .= "---\n";
+      $output .= $payload['bad'] . "\n";
+      $output .= "---\n"; 
+      $output .= "</pre></body></html>";
+      print $output;
+    }
+  }
+  
   public function download_interactive_grader() {
     if (isset($_REQUEST['contest_id']) && isset($_REQUEST['division_id']) && isset($_REQUEST['problem_id'])) {
       $contest_id = $_REQUEST['contest_id'];
