@@ -269,7 +269,8 @@ class JudgeActionHandler {
     $team_id = $in['team_id'];
     $ref_id = $in['ref_id'];
     $message = $in['message'];
-    $out['success'] = (DBManager::replyPost($contest_id, $team_id, $ref_id, $message) == 1);
+    DBManager::replyPost($contest_id, $team_id, $ref_id, $message);
+    $out['success'] = (DBManager::readPost($ref_id) == 1);
   }
   
   public function broadcast_post($in, &$out) {
