@@ -8,7 +8,7 @@ class JudgeScoreboardFrontend extends JudgeFrontend {
 ?>
 <style type="text/css">
 #scoreboard_table_div {
-  height: 100%;
+  height: auto;
 }
 
 #header {
