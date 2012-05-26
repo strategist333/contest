@@ -29,7 +29,7 @@ class SpeedScoreboardManager {
       $team_map = array();
       foreach ($info['teams'] as $team) {
         $team_map[$team['team_id']] = count($scoreboard);
-        array_push($scoreboard, array('team_id' => intval($team['team_id']), 'alias' => $team['alias'], 'score' => 0, 'time' => 0, 'judgments' => $empty_judgments));
+        array_push($scoreboard, array('team_id' => intval($team['team_id']), 'username' => $team['username'], 'alias' => $team['alias'], 'score' => 0, 'time' => 0, 'judgments' => $empty_judgments));
       }      
       foreach ($info['judgments'] as $judgment) {
         $problem_id = $judgment['problem_id'];
