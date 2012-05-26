@@ -3,6 +3,7 @@ import os
 import signal
 from string import Template
 import subprocess
+import sys
 import time
 import tempfile
 
