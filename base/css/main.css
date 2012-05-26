@@ -272,9 +272,8 @@ h5 {
   margin-bottom: 7px;
 }
 
-#soln_good:disabled,
-#soln_bad:disabled {
-  background: #ddd;
+#soln_good, #soln_bad {
+  height: 75px;
 }
 
 #problem_id,
