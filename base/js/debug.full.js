@@ -262,9 +262,11 @@
       if (type == "correct") {
         $("#soln_good_div").show();
         $("#soln_bad_div").hide();
+        $("#soln_bad").val("");
       }
       else if (type == "wrong") {
         $("#soln_good_div").hide();
+        $("#soln_good").val("");
         $("#soln_bad_div").show();
       }
       else {
