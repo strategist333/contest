@@ -19,7 +19,7 @@ class JudgeViewJudgments {
 (function ($) {
   var judgmentCorrect = <?= $k_judgment_correct ?>;
   var judgmentIncorrect = <?= $k_judgment_incorrect ?>;
-var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
+  var contestStartTime = <?= $g_curr_contest['time_start'] ?>;
   
   function renderPayloadTD(run, td) {
 <?php

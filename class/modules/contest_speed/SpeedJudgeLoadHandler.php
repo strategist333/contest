@@ -3,6 +3,19 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
 
 class SpeedJudgeLoadHandler extends JudgeLoadHandler {
   
+  public function view_source() {
+    if (isset($_REQUEST['contest_id']) && isset($_REQUEST['run_id'])) {
+      $contest_id = $_REQUEST['contest_id'];
+      $run_id = $_REQUEST['run_id'];
+      $run = DBManager::getRun($contest_id, $run_id);
+      $payload = $run['payload'];
+      $metadata = json_decode($run['run_metadata'], true);
+      $filename = $run['problem_alias'] . '.' . $metadata['extension'];
+      $this->writeDownloadHeader($filename, strlen($payload));
+      print $payload;
+    }
+  }
+  
   public function download_speed_zip() {
     if (isset($_REQUEST['contest_id']) && isset($_REQUEST['division_id']) && isset($_REQUEST['problem_id'])) {
       $contest_id = $_REQUEST['contest_id'];
