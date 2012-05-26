@@ -72,6 +72,10 @@ class SpeedScoreboardManager {
         }
         $metadata['team_scoreboard'] = $team_scoreboard;
       }
+      else {
+        $old_metadata = json_decode(DBManager::getContestDivisionMetadata($contest_id, $division_id), true);
+        $metadata['team_scoreboard'] = $old_metadata['team_scoreboard'];
+      }
       DBManager::modifyContestDivisionMetadata($contest_id, $division_id, json_encode($metadata));
       DBManager::commit();
       return array('teams' => $team_scoreboard, 'problems' => $problems);
