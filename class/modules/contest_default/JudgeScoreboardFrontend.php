@@ -69,7 +69,8 @@ class JudgeScoreboardFrontend extends JudgeFrontend {
         if (ret['success']) {
           var scoreboard = ret['scoreboard'];
           var thr = $("<tr>").append($("<th>").text("Rank"))
-                             .append($("<th>").text("Team"));
+                             .append($("<th>").text("Team"))
+                             .append($("<th>").text("Username"));
           $.each(scoreboard['problems'], function(index, problem) {
             thr.append($("<th>").text(problem['alias']));
           });
@@ -78,7 +79,8 @@ class JudgeScoreboardFrontend extends JudgeFrontend {
           var tbody = $("<tbody>");
           $.each(scoreboard['teams'], function(index, team) {
             var tr = $("<tr>").append($("<td>").text(index + 1))
-                              .append($("<td>").text(team['alias']));
+                              .append($("<td>").text(team['alias']))
+                              .append($("<td>").text(team['username']));
             $.each(team['judgments'], function(index, judgment) {
               var td = $("<td>").text(" ");
               if (judgment == judgmentCorrect) {
