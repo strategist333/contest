@@ -518,7 +518,7 @@ class DBManager {
   }
   
   public static function getRuns($contest_id, $count) {
-    return self::querySelect('select run_id, time_submitted, username, division_id, division_name, contests_divisions_problems.alias as problem_alias, judgments.status as judgment, runs.metadata as run_metadata, time_updated, judgments.metadata as judgment_metadata, judgment_id from runs join judgments using (run_id) join teams using (team_id) join divisions using (division_id) join problems using (problem_id) join contests_divisions_problems using (problem_id, division_id) where contest_id = ? order by time_submitted desc limit ' . $count, $contest_id);
+    return self::querySelect('select run_id, time_submitted, username, division_id, division_name, contests_divisions_problems.alias as problem_alias, judgments.status as judgment, runs.metadata as run_metadata, time_updated, judgments.metadata as judgment_metadata, judgment_id, teams.alias as team_alias from runs join judgments using (run_id) join teams using (team_id) join divisions using (division_id) join problems using (problem_id) join contests_divisions_problems using (problem_id, division_id) where contest_id = ? order by time_submitted desc limit ' . $count, $contest_id);
   }
   
   public static function getRun($contest_id, $run_id) {

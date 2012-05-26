@@ -18,6 +18,7 @@ class JudgeLoadHandler {
   }
   
   public function download_teams() {
+    global $k_teams_fields;
     if (isset($_REQUEST['contest_id'])) {
       $contest_id = $_REQUEST['contest_id'];
       $teams = DBManager::getTeams($contest_id);

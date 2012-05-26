@@ -51,6 +51,7 @@ class JudgeViewJudgments {
           $.each(ret['pending'], function(index, run) {
             var tr = $("<tr>")
               .append($("<td>").text(formatTime(run['time_submitted'] - contestStartTime)))
+              .append($("<td>").text(run['team_alias']))
               .append($("<td>").text(run['username']))
               .append($("<td>").text(run['division_name']))
               .append($("<td>").text(run['problem_alias']))
@@ -79,6 +80,7 @@ class JudgeViewJudgments {
           $.each(ret['done'], function(index, run) {
             var tr = $("<tr>")
               .append($("<td>").text(formatTime(run['time_submitted'] - contestStartTime)))
+              .append($("<td>").text(run['team_alias']))
               .append($("<td>").text(run['username']))
               .append($("<td>").text(run['division_name']))
               .append($("<td>").text(run['problem_alias']));
@@ -193,6 +195,7 @@ Display <input id="num_runs" type="text" value="50" /> runs
   <thead>
     <tr>
       <th>Time</th>
+      <th>Team Alias</th>
       <th>Username</th>
       <th>Division</th>
       <th>Problem Alias</th>
